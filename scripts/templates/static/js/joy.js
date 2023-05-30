@@ -265,50 +265,50 @@ var JoyStick = (function(container, parameters, callback)
         callback(StickStatus);
     }
 
-    // function getCardinalDirection()
-    // {
-    //     let result = "";
-    //     let orizontal = movedX - centerX;
-    //     let vertical = movedY - centerY;
+    function getCardinalDirection()
+    {
+        let result = "";
+        let orizontal = movedX - centerX;
+        let vertical = movedY - centerY;
         
-    //     if(vertical >= directionVerticalLimitNeg && vertical <= directionVerticalLimitPos)
-    //     {
-    //         result = "C";
-    //     }
-    //     if(vertical < directionVerticalLimitNeg)
-    //     {
-    //         result = "N";
-    //     }
-    //     if(vertical > directionVerticalLimitPos)
-    //     {
-    //         result = "S";
-    //     }
+        if(vertical >= directionVerticalLimitNeg && vertical <= directionVerticalLimitPos)
+        {
+            result = "C";
+        }
+        if(vertical < directionVerticalLimitNeg)
+        {
+            result = "N";
+        }
+        if(vertical > directionVerticalLimitPos)
+        {
+            result = "S";
+        }
         
-    //     if(orizontal < directionHorizontalLimitNeg)
-    //     {
-    //         if(result === "C")
-    //         { 
-    //             result = "W";
-    //         }
-    //         else
-    //         {
-    //             result += "W";
-    //         }
-    //     }
-    //     if(orizontal > directionHorizontalLimitPos)
-    //     {
-    //         if(result === "C")
-    //         { 
-    //             result = "E";
-    //         }
-    //         else
-    //         {
-    //             result += "E";
-    //         }
-    //     }
+        if(orizontal < directionHorizontalLimitNeg)
+        {
+            if(result === "C")
+            { 
+                result = "W";
+            }
+            else
+            {
+                result += "W";
+            }
+        }
+        if(orizontal > directionHorizontalLimitPos)
+        {
+            if(result === "C")
+            { 
+                result = "E";
+            }
+            else
+            {
+                result += "E";
+            }
+        }
         
-    //     return result;
-    // }
+        return result;
+    }
 
     /******************************************************
      * Public methods

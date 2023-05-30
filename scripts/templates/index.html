@@ -6,8 +6,7 @@
     <link rel="stylesheet" type="text/css" href="./static/style/reset.css">
     <link rel="stylesheet" type="text/css" href="./static/style/main.css">
     <script type="text/javascript" src="./static/js/roslib.min.js" ></script>
-    
-    
+    <script type="text/javascript" src="./static/js/joy.js"></script>    
   </head>
   <body>
     <div class="container">
@@ -22,27 +21,23 @@
 
     <div class="container buttons">
       <button type="flashlight" class="button btn-flashlight" id="flashlight" name="flashlight"></button>
-      <button type="rec" class="button btn-rec" id="rec" name="rec"></button>
-      <button type="photo" class="button btn-photo" id="photo" name="photo"></button>
+      <!-- <button type="rec" class="button btn-rec" id="rec" name="rec"></button> -->
+      <!-- <button type="photo" class="button btn-photo" id="photo" name="photo"></button> -->
       <button type="fullscreen" class="button btn-fullscreen" id="fullscreen" name="fullscreen"></button>
       
-      <button type="" class="button btn-pid-down" id="pid_down" name=""></button>
-      <button type="" class="button btn-pid-up" id="pid_up" name=""></button>
+      <!-- <button type="" class="button btn-pid-down" id="pid_down" name=""></button> -->
+      <!-- <button type="" class="button btn-pid-up" id="pid_up" name=""></button> -->
       <div id="depth" class="depth-class">Depth: ---</div>
-      <div id="pid-regulator" class="pid-class" value="PID"><button></button></div>
+      <!-- <div id="pid-regulator" class="pid-class" value="PID"><button></button></div> -->
       <div class="name">TRIONIX</div>
       <div id="joyDivLeft" class="joy_left"></div>
       <div id="joyDivRight" class="joy_rigth"></div>
       <!-- <canvas id="left_joy" class="joy_left"></canvas>
-      <canvas id="joy_rigth" class="joy_rigth"></canvas> -->
+      <canvas id="joy_rigth" class="joy_rigth"></canvas> -->  
     </div>
 
     <script type="text/javascript" src="./static/js/fullscreen.js" ></script>
-    <script type="text/javascript" src="./static/js/joy.js"></script>
-    <script type="module" src="static/js/joy_base.js"></script>
     <script type="module" src="./static/js/main.js"></script>
     <script type="text/javascript" src="./static/js/IMU.js"></script>
-    <!-- <script type="text/javascript" src="./static/IMU.js"></script> -->
-    <!-- <script type="text/javascript" src="{{ url_for('static', filename='scripts.js') }}"></script> -->
     </body>
 </html>

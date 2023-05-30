@@ -1,14 +1,3 @@
-// import { Joy, initT } from './joy_base.js';
-
-
-// let joy_1 = new Joy('joy_left');
-// let joy_2 = new Joy(joy_rigth);
-
-// let initT();
-
-// let joy1 = Joy_work(joy_1);
-// let joy2 = Joy_work(joy_2);
-
 
 var  ws_url = 'ws://0.0.0.0:9090';
 // var  ws_url = 'ws://192.168.1.100:9090';
@@ -38,6 +27,12 @@ var cmd_publisher = new ROSLIB.Topic({
     ros: ros,
     name: '/teleop_command',
     messageType: 'geometry_msgs/Twist'
+});
+
+var light_publisher = new ROSLIB.Topic({
+    ros: ros,
+    name: '/thrusters/ligth',
+    messageType: 'std_msgs/Float64'
 });
 
 // var pid_setpoint = new ROSLIB.Topic({
@@ -78,17 +73,14 @@ var joy_left = new JoyStick('joyDivRight', {
     "externalLineWidth": "5"
 });
 
-// ########## Controle ###########
-
-
 setInterval(function () { control(); }, 200);
 
 
 
 function control() {
     const up_down = joy_left.GetY()
-    left_right = joy_right.GetX()
-    forward_backward = joy_right.GetY()
+    var left_right = joy_right.GetX()
+    var forward_backward = joy_right.GetY()
     
     // if ((left_right < 0.2) || (left_right > -0.2)){
     //     left_right = 0;
@@ -105,6 +97,7 @@ function control() {
         }
     });
     cmd_publisher.publish(cmd)
+    // console.log(cmd)
 }
 
 
@@ -146,19 +139,6 @@ var image_subscriber = new ROSLIB.Topic({
 });
 
 
-
-
-// document.getElementById('fullscreen').onclick = function(){
-//     if (!document.fullscreenElement) {
-//         document.documentElement.requestFullscreen();
-//     } else {
-//       if (document.exitFullscreen) {
-//         document.exitFullscreen();
-//         }
-//     }
-// }
-
-
 // ############# Depth and PID #############
 
 
@@ -170,26 +150,26 @@ depth_subscriber.subscribe(function(msg) {
 });
 
 
-document.getElementById('pid_down').onclick = function(){
-    depth = depth - 0.1;
-    depth = Math.max(depth, 0.1);
-    const msg = new ROSLIB.Message({
-        data: depth
-    })
+// document.getElementById('pid_down').onclick = function(){
+//     depth = depth - 0.1;
+//     depth = Math.max(depth, 0.1);
+//     const msg = new ROSLIB.Message({
+//         data: depth
+//     })
 
-    pid_setpoint.publish(msg)
-}
+//     pid_setpoint.publish(msg)
+// }
 
 
-document.getElementById('pid_up').onclick = function(){
-    depth = depth + 0.1;
-    depth = Math.min(10.0, depth);
-    const msg = new ROSLIB.Message({
-        data: depth
-    })
+// document.getElementById('pid_up').onclick = function(){
+//     depth = depth + 0.1;
+//     depth = Math.min(10.0, depth);
+//     const msg = new ROSLIB.Message({
+//         data: depth
+//     })
 
-    pid_setpoint.publish(msg)
-}
+//     pid_setpoint.publish(msg)
+// }
 
 
 // ########## Video ##########
@@ -209,37 +189,16 @@ image_subscriber.subscribe(function (message) {
     };
 });
 
-
-// var pid_setpoint = new ROSLIB.Topic({
-//     ros: ros,
-//     name: '/pid/depth_pid/setpoint',
-//     messageType: 'std_msgs/Float64'
-// })
-
-// var pid_switch = new ROSLIB.Service({
-//     ros: ros,
-//     name: '/pid/depth_pid/switch',
-//     serviceType: 'std_srvs/SetBool'
-// });
-
-document.getElementById('pid-regulator').onclick = function(){
-    this.stat_pidr = !this.stat_pidr
-    var pidr_request = new ROSLIB.ServiceRequest({
-        data: this.stat_pidr ? true : false
-    });
-    pid_switch.callService(pidr_request, function(result) {
-        console.log(result)
-    })
-    console.log('sent pid request')
-}
-
-
-var light_publisher = new ROSLIB.Topic({
-    ros: ros,
-    name: '/thrusters/ligth',
-    messageType: 'std_msgs/Float64'
-});
-
+// document.getElementById('pid-regulator').onclick = function(){
+//     this.stat_pidr = !this.stat_pidr
+//     var pidr_request = new ROSLIB.ServiceRequest({
+//         data: this.stat_pidr ? true : false
+//     });
+//     pid_switch.callService(pidr_request, function(result) {
+//         console.log(result)
+//     })
+//     console.log('sent pid request')
+// }
 
 
 document.getElementById('flashlight').onclick = function(){
@@ -258,55 +217,6 @@ var cmd_publisher = new ROSLIB.Topic({
     messageType: 'geometry_msgs/Twist'
 });
 
-// var stat_flash = false
-// var stat_of_rec = false
-// const MAX_FORWARD = 0.006
-// const MAX_BACKWARD = 0.006
-// const MAX_DOWN = 0.006
-// const MAX_UP = 0.006
-// const MAX_ANGULAR = 0.006
-
-// var joy_right = new JoyStick('joyDivLeft', {
-//     "title": "joystick_right",
-//     "autoReturnToCenter": true,
-//     "internalFillColor": "#FF0000",
-//     "externalStrokeColor": "#800000",
-//     "externalLineWidth": "5"
-// });
-
-// var joy_left = new JoyStick('joyDivRight', {
-//     "title": "joystick_left",
-//     "autoReturnToCenter": true,
-//     "internalFillColor": "#FF0000",
-//     "externalStrokeColor": "#800000",
-//     "externalLineWidth": "5"
-// });
-
-// setInterval(function () { control(); }, 200);
-
-
-
-// function control() {
-//     const up_down = joy_left.GetY()
-//     left_right = joy_right.GetX()
-//     forward_backward = joy_right.GetY()
-    
-//     // if ((left_right < 0.2) || (left_right > -0.2)){
-//     //     left_right = 0;
-//     // }
-//    // forward_backward *= 0.5;
-
-//     var cmd = new ROSLIB.Message({        
-//         linear: {
-//             x: forward_backward > 0 ? forward_backward * MAX_FORWARD : forward_backward * MAX_BACKWARD,
-//             z: up_down > 0 ? -(up_down * MAX_UP) : -(up_down * MAX_DOWN)
-//         },
-//         angular: {
-//                 z: -(left_right / 10 * MAX_ANGULAR)
-//         }
-//     });
-//     cmd_publisher.publish(cmd)
-// }
 
 // var roll_subscriber = new ROSLIB.Topic({
 //     ros: ros,
@@ -334,15 +244,6 @@ var cmd_publisher = new ROSLIB.Topic({
 //         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 //     };
 // });
-
-
-
-// var image_subscriber = new ROSLIB.Topic({
-//     ros: ros,
-//     name: '/image_raw/compressed',
-//     messageType: 'sensor_msgs/CompressedImage'
-// });
-
 
 
 // document.getElementById('rec').onclick = function(){
