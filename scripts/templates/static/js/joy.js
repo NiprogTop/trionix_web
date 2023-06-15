@@ -38,11 +38,11 @@ var JoyStick = (function(container, parameters, callback)
     var title = (typeof parameters.title === "undefined" ? "joystick" : parameters.title),
         width = (typeof parameters.width === "undefined" ? 0 : parameters.width),
         height = (typeof parameters.height === "undefined" ? 0 : parameters.height),
-        internalFillColor = "#b1bbff44",
+        internalFillColor = "#bbbbbb44",
         internalLineWidth = (typeof parameters.internalLineWidth === "undefined" ? 2 : parameters.internalLineWidth),
-        internalStrokeColor =  "#0037b344",
+        internalStrokeColor =  "#bbbbbb44",
         externalLineWidth = (typeof parameters.externalLineWidth === "undefined" ? 2 : parameters.externalLineWidth),
-        externalStrokeColor =  "#00108044",
+        externalStrokeColor =  "#bbbbbb44",
         autoReturnToCenter = (typeof parameters.autoReturnToCenter === "undefined" ? true : parameters.autoReturnToCenter);
 
     callback = callback || function(StickStatus) {};
