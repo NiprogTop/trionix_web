@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <title>Trionix</title>
+    <link rel="stylesheet" type="text/css" href="./static/style/reset.css">
+    <link rel="stylesheet" type="text/css" href="./static/style/main.css">
+    <script type="text/javascript" src="./static/js/roslib.min.js" ></script>
+    <script type="text/javascript" src="./static/js/joy.js"></script>    
+  </head>
+  <body>
+    <div class="container1">
+      <canvas id="videoCanvas" class="video_stream">
+    </div>
+    
+    <div id="rotate">Please rotate your display</div>
+
+    <!-- <div class="container">
+      <div class="pitch"><canvas id="drawingCanvas" width="1920" height="1080"></canvas></div>
+    </div> -->
+
+    <div class="container buttons">
+      <button type="flashlight" class="button btn-flashlight" id="flashlight" name="flashlight"></button>
+      <!-- <button type="rec" class="button btn-rec" id="rec" name="rec"></button> -->
+      <!-- <button type="photo" class="button btn-photo" id="photo" name="photo"></button> -->
+      <button type="fullscreen" class="button btn-fullscreen" id="fullscreen" name="fullscreen"></button>
+      <div class="pid_control">
+        <button type="" class="button btn-pid-down" id="pid_down" name=""></button>
+        <button type="" class="button btn-pid-up" id="pid_up" name=""></button>
+        <div class="pid_lable">Установка глубины</div>
+        <div id="target_depth" class="pid_target_depth"> 0.0 </div>
+      </div>      
+      <div id="depth" class="depth-class">Глубина: ---</div>
+      <div id="pitch" class="pitch-class">Дифферент: ---</div>
+      <div class="pid_switch">
+        <label class="pid_lable">Удержание глубины</label>
+        <div class="buttonss r" id="button-1">
+          <input type="checkbox" class="checkbox" />
+          <div class="knobs"></div>
+          <div class="layer"></div>
+        </div>
+      </div>
+      
+      <div class="name">TRIONIX</div>
+      <div id="joyDivLeft" class="joy_left"></div>
+      <div id="joyDivRight" class="joy_rigth"></div>
+    </div>
+
+    <script type="text/javascript" src="./static/js/fullscreen.js" ></script>
+    <script type="module" src="./static/js/main.js"></script>
+    <!-- <script type="text/javascript" src="./static/js/IMU.js"></script> -->
+    </body>
+</html>
