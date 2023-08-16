@@ -2,7 +2,8 @@
 
 
 # PORT = 8009
-DIRECTORY = "/home/nick/trionix/src/trionix_web/scripts/templates/"
+# DIRECTORY = "/home/nick/trionix/src/trionix_web/scripts/templates/"
+DIRECTORY = "/home/coder/trionix_ws/src/trionix_web/scripts/templates/"
 # # IP = "45.10.1.137"
 IP = "192.168.0.143"
 

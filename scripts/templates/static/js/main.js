@@ -25,8 +25,7 @@ console.log('Connection to websocket server closed.');
 var cmd_publisher = new ROSLIB.Topic({
     ros: ros,
     // name: '/command',
-    // messageType: 'geometry_msgs/Wrench'
-    
+    // messageType: 'geometry_msgs/Wrench'    
     name: '/teleop_command',
     messageType: 'geometry_msgs/Twist'
     
@@ -84,11 +83,6 @@ function control() {
     var up_down = joy_left.GetY()    
     var left_right = joy_right.GetX()
     var forward_backward = joy_right.GetY()
-    
-    // if ((left_right < 0.2) || (left_right > -0.2)){
-    //     left_right = 0;
-    // }
-   // forward_backward *= 0.5;
 
     var cmd = new ROSLIB.Message({        
         // force: {
@@ -101,8 +95,7 @@ function control() {
                 z: -(left_right / 10 * MAX_ANGULAR)
         }
     });
-    cmd_publisher.publish(cmd)
-    // console.log(cmd)
+    cmd_publisher.publish(cmd);
 }
 
 
@@ -114,12 +107,6 @@ function control() {
 // }
 
 
-// document.getElementById('rec').onclick = function(){
-//     this.stat_of_rec = !this.stat_of_rec
-//     let recval = new XMLHttpRequest();
-//     recval.open('GET', '/record?date_from_Nick_Kapustin=' + (this.stat_of_rec ? 1 : 0), true);
-//     recval.send();
-// }
 
 // ########### Subs ##############
 
@@ -176,7 +163,6 @@ document.getElementById('pid_down').onclick = function(){
         data: depth
     })
     document.getElementById('target_depth').textContent = depth.toFixed(1);
-    // console.log("<")
     pid_setpoint.publish(msg)
 }
 
@@ -188,7 +174,6 @@ document.getElementById('pid_up').onclick = function(){
         data: depth
     })
     document.getElementById('target_depth').textContent = depth.toFixed(1);
-    // console.log(">")
     pid_setpoint.publish(msg)
 }
 
@@ -217,16 +202,6 @@ image_subscriber.subscribe(function (message) {
 });
 
 
-// document.getElementById('pid-regulator').onclick = function(){
-//     this.stat_pidr = !this.stat_pidr
-//     var pidr_request = new ROSLIB.ServiceRequest({
-//         data: this.stat_pidr ? true : false
-//     });
-//     pid_switch.callService(pidr_request, function(result) {
-//         console.log(result)
-//     })
-//     console.log('sent pid request')
-// }
 
 
 document.getElementById('flashlight').onclick = function(){
@@ -242,44 +217,3 @@ document.getElementById('flashlight').onclick = function(){
     console.log(stat);
 }
 
-// var cmd_publisher = new ROSLIB.Topic({
-//     ros: ros,
-//     name: '/teleop_command',
-//     messageType: 'geometry_msgs/Twist'
-// });
-
-
-// var roll_subscriber = new ROSLIB.Topic({
-//     ros: ros,
-//     name: '/roll',
-//     messageType: 'std_msgs/Float64'
-// })
-
-// var SysControl = ROSLIB.Topic({
-//     ros: ros,
-//     name: '/image_raw/compressed',
-//     messageType: 'sensor_msgs/CompressedImage'
-// });
-
-// var canvas = document.getElementById("videoCanvas");
-// canvas.width = window.innerWidth;
-// canvas.height = window.innerHeight;
-
-// image_subscriber.subscribe(function (message) {
-//     var canvas = document.getElementById("videoCanvas");
-//     var ctx = canvas.getContext("2d");
-
-//     var img = new Image();
-//     img.src = "data:image/jpeg;base64," + message.data;
-//     img.onload = function () {
-//         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-//     };
-// });
-
-
-// document.getElementById('rec').onclick = function(){
-//     this.stat_of_rec = !this.stat_of_rec
-//     let recval = new XMLHttpRequest();
-//     recval.open('GET', '/record?date_from_Nick_Kapustin=' + (this.stat_of_rec ? 1 : 0), true);
-//     recval.send();
-// }
