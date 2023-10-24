@@ -4,7 +4,8 @@
 # PORT = 8009
 DIRECTORY = "/home/nick/trionix/src/trionix_web/scripts/templates/"
 # # IP = "45.10.1.137"
-IP = "192.168.0.143"
+# IP = "192.168.0.143"
+IP = "0.0.0.0"
 
 
 import http.server 

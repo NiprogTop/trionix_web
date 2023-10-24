@@ -15,11 +15,22 @@
     
     <div id="rotate">Please rotate your display</div>
 
-    <!-- <div class="container">
-      <div class="pitch"><canvas id="drawingCanvas" width="1920" height="1080"></canvas></div>
-    </div> -->
-
     <div class="container buttons">
+      <div class="hamburger-menu">
+        
+        <input id="menu__toggle" type="checkbox" />
+        <div class="black_page"></div>
+        <div class="black_page_base" id="black_page"></div>
+        <label class="menu__btn" for="menu__toggle">
+          <span></span>
+        </label>
+    
+        <ul class="menu__box" id="menu__box">
+          <li><a class="menu__item" onclick="screen_controle()" href="#">Управление</a></li>
+          <li><a class="menu__item"  id="settings_screen" href="#">Настройки</a></li>
+        </ul>
+      </div>
+
       <button type="flashlight" class="button btn-flashlight" id="flashlight" name="flashlight"></button>
       <!-- <button type="rec" class="button btn-rec" id="rec" name="rec"></button> -->
       <!-- <button type="photo" class="button btn-photo" id="photo" name="photo"></button> -->
@@ -41,6 +52,19 @@
         </div>
       </div>
       
+      <div id="settings" class="settings_block">
+        <h2 class="blockname">Настройки портов</h2>
+        <div class="settings_grid" id="settings_grid">
+          
+        </div>
+        <div class="setting_buttons">
+          <button class="settings_upload button_set" id="settings_upload"> Обновить </button>
+          <button class="settings_save button_set" id="settings_save"> Сохранить </button>
+        </div>
+        
+        
+      </div>
+
       <div class="name">TRIONIX</div>
       <div id="joyDivLeft" class="joy_left"></div>
       <div id="joyDivRight" class="joy_rigth"></div>

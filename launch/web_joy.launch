@@ -6,17 +6,26 @@
 		<param name="image_width" type="string" value="640" />
 		<param name="image_height" type="string" value="420" />
 	</node>	-->
-
-	
 	
 	<node pkg="trionix_web" type="web_control.py" name="web_control" output="screen">
-		
+
 	</node>
 
 	<include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" > 
 		<arg name="port" value="9090"/>
 		<arg name="address" value="0.0.0.0"/>
 	</include>  
+
+
+	<node name="thrusters_controller" pkg="thrusters_controllers" type="thrusters_controller_node" output="screen">
+		<rosparam command="load" file="$(find trionix_new)/config/thrusters2.yaml" />
+	</node>
+	<!-- <node machine="trion" pkg="trionix_new" type="trionix_hat.py" name="hat" respawn="true" output="screen">
+  	   <remap from="/thrusters_3" to="/thrusters/front"/>
+ 	   <remap from="/thrusters_1" to="/thrusters/right"/>
+ 	   <remap from="/thrusters_2" to="/thrusters/left"/>
+ 	   <remap from="/thrusters_0" to="/thrusters/back"/>
+ 	</node> -->
 
     <!-- <node pkg="ocam_driver" type="ocam_driver_node" name="camera" output="screen">
            <param name="device"  value="/dev/video2"/>
