@@ -2,6 +2,7 @@ html{
     /* border: 3px solid red; */
     width: 100%;
     height: 100%;
+    background-color: #333333;
 }
 
 :root {
@@ -42,6 +43,14 @@ body{
     left: 0;
     /* background-color: #c9c8c8; */
 
+}
+
+::-webkit-scrollbar {
+  width: 0;
+}
+
+.container1::-webkit-scrollbar {
+  width: 10px;
 }
 
 /* rotate */
@@ -151,10 +160,10 @@ body{
   .black_page{
     display: none;
     position: absolute;
-    top: -10%;
+    /* top: -10%; */
     width: 100%;
     height: 100%;
-    padding-top: 10%;
+    /* padding-top: 10%; */
     z-index: 8;
     background-color: #333333;
   }
@@ -162,10 +171,10 @@ body{
   .black_page_base{
     display: none;
     position: absolute;
-    top: -10%;
+    /* top: -10%; */
     width: 100%;
     height: 100%;
-    padding-top: 10%;
+    /* padding-top: 10%; */
     z-index: 8;
     background-color: #333333;
   }
@@ -180,11 +189,11 @@ body{
     z-index: 9;
     background-color: #2d2d30;
     position: absolute;
-    height: 80vh;
-    width: 40vw;
+    min-height: 80vh;
+    width: 60vw;
     align-content: center;
     top: 10vh;
-    left:30vw;
+    left:20vw;
     border: solid 5px rgb(102, 102, 102);
     border-radius: 15px;
 }
@@ -205,7 +214,7 @@ body{
 #settings .settings_grid{
     display: grid;
     padding: 2vh 0;
-    grid-template-columns: 2fr 2fr 3fr;
+    grid-template-columns: 4fr 2fr 3fr;
     gap: 2vh 1vw;
 }
 
@@ -968,6 +977,7 @@ button:fullscreen{
 
     #settings{
       height: 90vh;
+      /* width: 60vw; */
     }
 
     .settings_save{
@@ -1004,3 +1014,131 @@ button:fullscreen{
       font-size: 0.9em;
     }
 }
+
+
+/* ############   MISSION BLOCK   ########### */
+
+#missions{
+  display: none;
+  z-index: 9;
+  background-color: #2d2d30;
+  position: absolute;
+  min-height: 80vh;
+  width: 60vw;
+  align-content: center;
+  top: 10vh;
+  left:20vw;
+  border: solid 5px rgb(102, 102, 102);
+  border-radius: 15px;
+}
+
+#missions .blockname{
+  /* position: relative; */
+  color: #eeeeee;
+  font-size: 1.8em;
+  font-weight: 600;
+  text-transform: uppercase;
+  width: auto;
+  text-align: center;
+  padding: 3% 0 0 0;
+  /* border: solid 3px #03f437; */
+  /* align-content: center; */
+}
+
+#description {
+  background-color: #333;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-left: 5px solid #ccc;
+  max-height: 150px; /* добавлено ограничение по высоте */
+  overflow-y: auto; /* изменено с overflow-y: scroll; */
+  color: #c5d6d6;
+}
+
+#description::-webkit-scrollbar {
+  width: 10px;
+  background-color: #333;
+}
+
+#description::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: #818181;
+}
+
+#description::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.2);
+  border-radius: 10px;
+  background-color: #3b3b3b;
+}
+
+/* Убрать полосу прокрутки для всей страницы
+::-webkit-scrollbar {
+  width: 0;
+} */
+
+/* .custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #6b6b6b #3a3a3a;
+  overflow-y: scroll;
+} */
+
+/* .custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #494949;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #474747;
+} */
+
+
+.json-editor {
+  width: 80%;
+  margin: 20px auto;
+}
+
+textarea {
+  width: 100%;
+  height: 300px;
+  padding: 0px !important;
+  /* margin-bottom: 10px; */
+  border-width: 0;
+  border-style: solid;
+}
+
+.ssm_butt {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+#message {
+  font-family: monospace;
+  font-weight: 600;
+  padding: 10px 0;
+  /* margin-top: 10px; */
+}
+
+.success {
+  color: rgb(0, 161, 0);
+}
+
+.error {
+  color: red;
+}
+
+.mission_description{
+  background-color: #333;
+  width: 80%;
+  min-height: 50px;
+  margin: 20px auto;
+  padding: 15px 0;
+  color: #c5d6d6;
+  border-radius: 10px;
+}
+

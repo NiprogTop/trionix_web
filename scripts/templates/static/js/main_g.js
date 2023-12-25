@@ -1,7 +1,7 @@
-var  ws_url = 'ws://10.42.0.1:9090';
+// var  ws_url = 'ws://10.42.0.1:9090';
 // var  ws_url = 'ws://192.168.1.47:9090';
 // var  ws_url = 'ws://192.168.1.101:9090';
-// var  ws_url = 'ws://0.0.0.0:9090';
+var  ws_url = 'ws://0.0.0.0:9090';
 
 
 
@@ -22,6 +22,30 @@ console.log('Connection to websocket server closed.');
 });
 
 // ######  Publish topics and serbvice  ######  
+
+// var teleop_start =  new ROSLIB.Service({
+//     ros : ros,
+//     name : '/state_machine/start',
+//     serviceType : 'std_srvs/Empty'
+// });
+
+// // ros.getParams(function(params) {
+// //     console.log(params);
+// // });
+
+// var teleop_status = new ROSLIB.Param({
+//     ros : ros,
+//     name : 'control_type'
+// });
+
+// teleop_status.get(function(data) {
+//     console.log('MAX VAL: ' + data);
+// });
+
+// teleop_status.set('hello_42');
+// // maxVelX.get(function(value) {
+// //   console.log('MAX VAL: ' + value);
+// // });
 
 var cmd_publisher = new ROSLIB.Topic({
     ros: ros,
@@ -110,7 +134,7 @@ function control() {
         // force: {
         linear: {
             x: forward_backward > 0 ? forward_backward * MAX_FORWARD : forward_backward * MAX_BACKWARD,
-            y: left_right_slide > 0 ? (left_right_slide * MAX_UP) : (left_right_slide * MAX_DOWN),
+            y: left_right_slide > 0 ? -(left_right_slide * MAX_UP) : -(left_right_slide * MAX_DOWN),
             z: up_down > 0 ? (up_down * MAX_UP) : (up_down * MAX_DOWN)
 
         },
@@ -227,7 +251,8 @@ let thr_list_generation = function(){
         // console.log(`${thr_name}: ${thr_config_name[thr_name]["thruster_number"]}`);
         let nameDiv = document.createElement('div');
         nameDiv.className = 'thrust_name';
-        nameDiv.textContent = "мотор_" + thr_num;
+        nameDiv.textContent = thr_name;
+        // nameDiv.textContent = "мотор_" + thr_num;
         thr_num++;
         // nameDiv.textContent = thr_name;
 

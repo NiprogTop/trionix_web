@@ -14,19 +14,20 @@
     </div>
     
     <div id="rotate">Please rotate your display</div>
-
+    <div class="black_page_base" id="black_page"></div>
     <div class="container buttons">
       <div class="hamburger-menu">
         
         <input id="menu__toggle" type="checkbox" />
-        <div class="black_page"></div>
-        <div class="black_page_base" id="black_page"></div>
+        <!-- <div class="black_page"></div> -->
+        <!-- <div class="black_page_base" id="black_page"></div> -->
         <label class="menu__btn" for="menu__toggle">
           <span></span>
         </label>
     
         <ul class="menu__box" id="menu__box">
-          <li><a class="menu__item" onclick="screen_controle()" href="#">Управление</a></li>
+          <li><a class="menu__item"  id="main_screen" href="#">Управление</a></li>
+          <li><a class="menu__item"  id="mission_screen" href="#">Автономность</a></li>
           <li><a class="menu__item"  id="settings_screen" href="#">Настройки</a></li>
         </ul>
       </div>
@@ -61,6 +62,52 @@
           <button class="settings_upload button_set" id="settings_upload"> Обновить </button>
           <button class="settings_save button_set" id="settings_save"> Сохранить </button>
         </div>
+        
+        
+      </div>
+
+      <div id="missions" class="mission_block">
+        <h2 class="blockname">Создание миссий</h2>
+        <!-- <div class="settings_grid" id="settings_grid">
+          
+        </div> -->
+        <!-- <div class="mission_description">
+          <p class="descript_h">Mission</p>
+        </div> -->
+        <div class="json-editor">
+          <div id="description">
+            <div class="custom-scrollbar">
+              <p>Описание функций:</p>
+              <ul>
+                <li>Save - сохраняет введенный JSON</li>
+                <li>Format - форматирует введенный JSON</li>
+                <li>Download - загружает сохраненный JSON</li>
+                <li>Upload - выгружает данные JSON в блок JSON</li>
+              </ul>
+              <p class="data">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis neque similique magni aliquid, repudiandae illum voluptatibus dolore corporis quos, exercitationem enim minima cumque optio perferendis sequi, cupiditate accusantium? Distinctio, ad.
+              </p>
+              <p class="data">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis neque similique magni aliquid, repudiandae illum voluptatibus dolore corporis quos, exercitationem enim minima cumque optio perferendis sequi, cupiditate accusantium? Distinctio, ad.
+              </p>
+              <p class="data">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis neque similique magni aliquid, repudiandae illum voluptatibus dolore corporis quos, exercitationem enim minima cumque optio perferendis sequi, cupiditate accusantium? Distinctio, ad.
+              </p>
+            </div>
+          </div>
+          <textarea id="json-text" rows="10" cols="50"></textarea>
+          <div id="message"></div>
+          <!-- <button id="download-button"><img src="download-icon.png" alt="Download"></button> -->
+          <button class="ssm_butt" id="upload-button"><img src="upload-icon.png" alt="Upload"></button>
+          <button class="ssm_butt" id="format-button">Format</button>
+          <button class="ssm_butt" id="mission-start-button">Start!</button>
+          
+          
+        </div>
+        <!-- <div class="setting_buttons">
+          <button class="settings_upload button_set" id="settings_upload"> Обновить </button>
+          <button class="settings_save button_set" id="settings_save"> Сохранить </button>
+        </div> -->
         
         
       </div>
