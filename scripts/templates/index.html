@@ -32,26 +32,31 @@
         </ul>
       </div>
 
-      <button type="flashlight" class="button btn-flashlight" id="flashlight" name="flashlight"></button>
+      <!-- <button type="flashlight" class="button btn-flashlight" id="flashlight" name="flashlight"></button> -->
       <!-- <button type="rec" class="button btn-rec" id="rec" name="rec"></button> -->
       <!-- <button type="photo" class="button btn-photo" id="photo" name="photo"></button> -->
       <button type="fullscreen" class="button btn-fullscreen" id="fullscreen" name="fullscreen"></button>
-      <div class="pid_control">
+      <!-- <div class="pid_control">
         <button type="" class="button btn-pid-down" id="pid_down" name=""></button>
         <button type="" class="button btn-pid-up" id="pid_up" name=""></button>
         <div class="pid_lable">Установка глубины</div>
         <div id="target_depth" class="pid_target_depth"> 0.0 </div>
-      </div>      
+      </div>       -->
       <div id="depth" class="depth-class">Глубина: ---</div>
       <div id="pitch" class="pitch-class">Дифферент: ---</div>
-      <div class="pid_switch">
+      <div id="heading" class="heading-class">Курс: ---</div>
+
+      <!-- <div class="image-bar"></div>
+      <div class="image-bar-point"></div> -->
+      
+      <!-- <div class="pid_switch">
         <label class="pid_lable">Удержание глубины</label>
         <div class="buttonss r" id="button-1">
           <input type="checkbox" class="checkbox" />
           <div class="knobs"></div>
           <div class="layer"></div>
         </div>
-      </div>
+      </div> -->
       
       <div id="settings" class="settings_block">
         <h2 class="blockname">Настройки портов</h2>
@@ -77,28 +82,114 @@
         <div class="json-editor">
           <div id="description">
             <div class="custom-scrollbar">
-              <p>Описание функций:</p>
-              <ul>
-                <li>Save - сохраняет введенный JSON</li>
-                <li>Format - форматирует введенный JSON</li>
-                <li>Download - загружает сохраненный JSON</li>
-                <li>Upload - выгружает данные JSON в блок JSON</li>
-              </ul>
-              <p class="data">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis neque similique magni aliquid, repudiandae illum voluptatibus dolore corporis quos, exercitationem enim minima cumque optio perferendis sequi, cupiditate accusantium? Distinctio, ad.
-              </p>
-              <p class="data">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis neque similique magni aliquid, repudiandae illum voluptatibus dolore corporis quos, exercitationem enim minima cumque optio perferendis sequi, cupiditate accusantium? Distinctio, ad.
-              </p>
-              <p class="data">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis neque similique magni aliquid, repudiandae illum voluptatibus dolore corporis quos, exercitationem enim minima cumque optio perferendis sequi, cupiditate accusantium? Distinctio, ad.
-              </p>
+              <h2>Краткая инструкция</h2>
+              <p>Данная вкладка предназначена для создания, радактирования и запуска автономных миссий для роботов "Гуппи" и "Трионикс". 
+              План миссий строится в формате JSON.</p>
+              <h2>Описание кнопок управления</h2>
+              <p> <b>Upload</b> - Загрузка и сохранение кода миссии в робота.</p>
+              <p> <b>Format</b> - Форматирование и проверка правильности оформления кода по стандарту JSON.</p>
+              <p> <b>Start!</b> - Запуск автономной миссии робота. Запускает последнюю загруженную миссию и блокирует ручное управление.</p>
+              <h2>Методы и функции</h2>
+              <h3>Базовая структура блока:</h3>
+              <pre class="code">
+                "Name_ID":{
+                  "Action type":{
+                    "param": value,
+                    "param": value
+                  }
+                }</pre>
+              <p> <b>"Name_ID":{...}</b> - Персональное имя действия (Не должно повторяться ни у одного блока).</p>
+              <p> <b>"Action type":{...}</b> - Тип действия с указание необходимых параметров.</p>
+              <p> <b>"param": value</b> - Параметры функции действия. Если параметр не требуется, задайтся нулевое значение.</p>
+              
+              <h3>Погружение и изменение глубины (Submerge): </h3>
+              <pre class="code">
+                "Submerge":{
+                  "depth": 0.2
+                }</pre>
+              <p> <b>"depth": value</b> - Указывается требуемая глубина для удержания с точностью 0.1 м.</p>
+
+              <h3>Движение по таймеру (Move): </h3>
+              <pre class="code">
+                "Move": {
+                  "axis_x": 0.4,
+                  "axis_y": 0,
+                  "axis_z": 0,
+                  "time": 12
+                }</pre>
+              <p> <b>"axis_x": value</b> - Движение +вперёд\-назад.</p>
+              <p> <b>"axis_y": value</b> - Движение -вправо\+влево.</p>
+              <p> <b>"axis_z": value</b> - Движение -вниз\+вверх.</p>
+              <p> <b>"time": value</b> - Время выполнение команды в секундах.</p>
+
+              <h3>Поворот по заданному углу (Turning): </h3>
+              <pre class="code">
+                "Turning": {
+                  "angle": -30
+                }</pre>
+                <p> <b>"angle": value</b> - Поворот -левый\+правый.</p>
+                <p> Нулевой угол считается от угла при старте миссии.</p>
+              <!-- <p> <b>"axis_y": value</b> - Поворот -вниз\+вверх.</p>
+              <p> <b>"axis_z": value</b> - Поворот +вправо\-влево.</p>
+              <p> <b>"time": value</b> - Время выполнение команды в секундах.</p> -->
+
+              <h3>Ожидание по таймеру (Waiting): </h3>
+              <pre class="code">
+                "Waiting": {
+                  "time": 5
+                }</pre>
+              <p> <b>"time": value</b> - Время бездействия робота с удержанием заданной глубины секундах.</p>
+
+              <h3>Финальное всплытие (Emerge): </h3>
+              <pre class="code">
+                "Emerge": true</pre>
+              <p> <b>true</b> - Всегда необходимо вставлять в конец мисси для всплытия робота на поверхность и перехода в режим телеуправления.</p>
+
+              <h2>Пример миссии:</h2><br>
+              <pre class="code">
+  {
+    "Go_1":{
+        "Submerge":{
+        "depth": 0.2
+        }
+    },
+
+    "Move_1":{
+        "Move": {
+            "axis_x": 0.4,
+            "axis_y": 0,
+            "axis_z": 0,
+            "time": 12
+        }
+    },
+
+    "Turn":{
+        "Turning": {
+            "axis_y": 0.2,
+            "axis_z": 0,
+            "time": 2
+        }
+    },
+
+    "Wait_1":{
+        "Waiting": {
+            "time": 3
+        }
+    },
+
+    "End":{
+        "Emerge": true
+    }
+  } </pre>
             </div>
           </div>
           <textarea id="json-text" rows="10" cols="50"></textarea>
           <div id="message"></div>
           <!-- <button id="download-button"><img src="download-icon.png" alt="Download"></button> -->
-          <button class="ssm_butt" id="upload-button"><img src="upload-icon.png" alt="Upload"></button>
+          <button class="ssm_butt" id="upload-button">
+            <!-- <img src="/static/img/arrow_down.png" alt="Upload"> -->
+            Upload
+          </button>
           <button class="ssm_butt" id="format-button">Format</button>
           <button class="ssm_butt" id="mission-start-button">Start!</button>
           
@@ -118,7 +209,7 @@
     </div>
 
     <script type="text/javascript" src="./static/js/fullscreen.js" ></script>
-    <script type="module" src="./static/js/main.js"></script>
+    <script type="module" src="./static/js/main_g.js"></script>
     <!-- <script type="text/javascript" src="./static/js/IMU.js"></script> -->
     </body>
 </html>

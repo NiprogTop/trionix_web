@@ -3,7 +3,7 @@
 // var  ws_url = 'ws://192.168.1.101:9090';
 var  ws_url = 'ws://0.0.0.0:9090';
 
-let control_type = "teleop"
+let control_type = "web"
 let mission_stat_vel = 0
 
 
@@ -381,70 +381,7 @@ document.getElementById('settings_screen').onclick = function(){
 }
 
 
-document.getElementById('mission_screen').onclick = function(){
-    document.getElementById('missions').style.display == 'block' ? document.getElementById('missions').style.display = 'block' : document.getElementById('missions').style.display = 'block';
-    document.getElementById('settings').style.display == 'block' ? document.getElementById('settings').style.display = 'none' : document.getElementById('settings').style.display = 'none';
-    document.getElementById('black_page').style.display == 'block' ? document.getElementById('black_page').style.display = 'block' : document.getElementById('black_page').style.display = 'block';
-    document.getElementById('menu__toggle').checked = false;
-    mission_load_signal.publish()
-}
 
-let ssm_pub = function(dat){
-    const mis_str = JSON.stringify(dat);
-    var mission_dat = new ROSLIB.Message({
-        data: mis_str
-    });
-    mission_publisher.publish(mission_dat);
-    console.log("pub");
-}
-
-document.getElementById('upload-button').addEventListener('click', function() {
-    var jsonText = document.getElementById('json-text').value;
-    try {
-      var jsonData = JSON.parse(jsonText);
-      // Действия с данными JSON
-    //   console.log(jsonData);
-      ssm_pub(jsonData);
-      console.log("ssm_publ");
-      document.getElementById('message').innerText = 'Mission upload successfully';
-      document.getElementById('message').classList.remove('error');
-      document.getElementById('message').classList.add('success');
-      
-      mission_stat_vel = 1
-      mission_status.set(mission_stat_vel)
-    } catch (error) {
-      document.getElementById('message').innerText = 'Error: Invalid mission format';
-      document.getElementById('message').classList.remove('success');
-      document.getElementById('message').classList.add('error');
-    }
-  });
-
-  document.getElementById('mission-start-button').addEventListener('click', function() {
-    // if (mission_stat_vel == 0){
-    //     mission_stat_vel = 1;
-    //     mission_status.set(mission_stat_vel);
-    // } else{
-    mission_stat_vel = 2;
-    mission_status.set(mission_stat_vel);
-    // }
-    teleop_start.callService();
-    console.log("Start Mission!")
-  });
-  
-  document.getElementById('format-button').addEventListener('click', function() {
-    var jsonText = document.getElementById('json-text').value;
-    try {
-      var formattedJson = JSON.stringify(JSON.parse(jsonText), null, 2);
-      document.getElementById('json-text').value = formattedJson;
-      document.getElementById('message').innerText = 'Mission formatted successfully';
-      document.getElementById('message').classList.remove('error');
-      document.getElementById('message').classList.add('success');
-    } catch (error) {
-      document.getElementById('message').innerText = 'Error: Invalid mission format';
-      document.getElementById('message').classList.remove('success');
-      document.getElementById('message').classList.add('error');
-    }
-  });
   
   
 
@@ -533,28 +470,108 @@ document.getElementById('flashlight').onclick = function(){
     console.log(stat);
 }
 
+
+
 // ########      State_Machine      #########
 
-let control_type_switch = function(){
-    control_type == "web" ? (control_type = "sm") : (control_type = "web") 
-    return control_type
+setInterval(function () { control(); }, 1000);
+let update_status = function(){
+    mission_status.get(function(data) {
+        // console.log('mission_status: ' + data);
+        mission_stat_vel = data;
+    }); 
+    teleop_status.get(function(data) {
+        // console.log('control_type: ' + data);
+        control_type = data;
+    });
+};
+
+document.getElementById('mission_screen').onclick = function(){
+    document.getElementById('missions').style.display == 'block' ? document.getElementById('missions').style.display = 'block' : document.getElementById('missions').style.display = 'block';
+    document.getElementById('settings').style.display == 'block' ? document.getElementById('settings').style.display = 'none' : document.getElementById('settings').style.display = 'none';
+    document.getElementById('black_page').style.display == 'block' ? document.getElementById('black_page').style.display = 'block' : document.getElementById('black_page').style.display = 'block';
+    document.getElementById('menu__toggle').checked = false;
+    mission_load_signal.publish()
 }
 
-let mission_status_change = function(){
-    
-    // control_type == "web" ? (control_type = "sm") : (control_type = "web") 
-    return mission_stat_vel
+let ssm_pub = function(dat){
+    const mis_str = JSON.stringify(dat);
+    var mission_dat = new ROSLIB.Message({
+        data: mis_str
+    });
+    mission_publisher.publish(mission_dat);
+    console.log("pub");
 }
 
-document.getElementById('flashlight').onclick = function(){
-    teleop_status.set(control_type_switch())
-    console.log('New control_type: ' + control_type);
-}
+document.getElementById('upload-button').addEventListener('click', function() {
+    var jsonText = document.getElementById('json-text').value;
+    try {
+      var jsonData = JSON.parse(jsonText);
+      // Действия с данными JSON
+      ssm_pub(jsonData);
+      console.log("ssm_publ");
+      document.getElementById('message').innerText = 'Mission upload successfully';
+      document.getElementById('message').classList.remove('error');
+      document.getElementById('message').classList.add('success');
+      
+      mission_stat_vel = 1
+      mission_status.set(mission_stat_vel)
+    } catch (error) {
+      document.getElementById('message').innerText = 'Error: Invalid mission format';
+      document.getElementById('message').classList.remove('success');
+      document.getElementById('message').classList.add('error');
+    }
+  });
 
-document.getElementById('flashlight').onclick = function(){
-    teleop_status.set(control_type_switch())
-    console.log('New mission_status: ' + mission_stat_vel);
-}
+  document.getElementById('mission-start-button').addEventListener('click', function() {
+    // if (mission_stat_vel == 0){
+    //     mission_stat_vel = 1;
+    //     mission_status.set(mission_stat_vel);
+    // } else{
+    // mission_stat_vel = 2;
+    // mission_status.set(mission_stat_vel);
+    // }
+    control_type = "sm"
+    teleop_status.set(control_type)
+    teleop_start.callService();
+    console.log("Start Mission!")
+  });
+  
+  document.getElementById('format-button').addEventListener('click', function() {
+    var jsonText = document.getElementById('json-text').value;
+    try {
+      var formattedJson = JSON.stringify(JSON.parse(jsonText), null, 2);
+      document.getElementById('json-text').value = formattedJson;
+      document.getElementById('message').innerText = 'Mission formatted successfully';
+      document.getElementById('message').classList.remove('error');
+      document.getElementById('message').classList.add('success');
+    } catch (error) {
+      document.getElementById('message').innerText = 'Error: Invalid mission format';
+      document.getElementById('message').classList.remove('success');
+      document.getElementById('message').classList.add('error');
+    }
+  });
+
+
+// let control_type_switch = function(){
+//     control_type == "web" ? (control_type = "sm") : (control_type = "web") 
+//     return control_type
+// }
+
+// let mission_status_change = function(){    
+//     // control_type == "web" ? (control_type = "sm") : (control_type = "web") 
+//     return mission_stat_vel
+// }
+
+// document.getElementById('flashlight').onclick = function(){
+//     teleop_status.set(control_type_switch());
+//     console.log('New control_type: ' + control_type);
+// }
+
+// document.getElementById('flashlight').onclick = function(){
+//     teleop_status.set(control_type_switch());
+//     console.log('New mission_status: ' + mission_stat_vel);
+// }
 
 
 // var canvas = document.getElementById("videoCanvas");
