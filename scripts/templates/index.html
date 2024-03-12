@@ -10,10 +10,12 @@
   </head>
   <body>
     <div class="container1">
-      <canvas id="videoCanvas" class="video_stream">
+      <img id="videoImage" src="./static/img/t-mno-sinij-fon.jpg" >
+      <!-- <video id="video-player" autoplay></video> -->
+      <!-- <canvas id="videoCanvas" class="video_stream"> -->
     </div>
     
-    <div id="rotate">Please rotate your display</div>
+    <div id="rotate">Поверните устройство!</div>
     <div class="black_page_base" id="black_page"></div>
     <div class="container buttons">
       <div class="hamburger-menu">
@@ -27,21 +29,28 @@
     
         <ul class="menu__box" id="menu__box">
           <li><a class="menu__item"  id="main_screen" href="#">Управление</a></li>
-          <li><a class="menu__item"  id="mission_screen" href="#">Автономность</a></li>
+          <!-- <li><a class="menu__item"  id="mission_screen" href="#">Автономность</a></li> -->
           <li><a class="menu__item"  id="settings_screen" href="#">Настройки</a></li>
         </ul>
       </div>
 
-      <!-- <button type="flashlight" class="button btn-flashlight" id="flashlight" name="flashlight"></button> -->
-      <!-- <button type="rec" class="button btn-rec" id="rec" name="rec"></button> -->
-      <!-- <button type="photo" class="button btn-photo" id="photo" name="photo"></button> -->
+      <!-- <input type="grab" min="1" max="100" value="0" class="btn-grab" id="myRange"> -->
+      <div class="slidecontainer">
+        <input type="range" min="1" max="100" value="0" class="btn-grab" id="trionixGrab">
+      </div>
+
+      <button type="flashlight" class="button btn-flashlight" id="flashlight" name="flashlight"></button>
+      <button type="rec" class="button btn-rec" id="rec" name="rec"></button>
+      <button type="photo" class="button btn-photo" id="photo" name="photo"></button>
       <button type="fullscreen" class="button btn-fullscreen" id="fullscreen" name="fullscreen"></button>
-      <!-- <div class="pid_control">
+      
+      <div class="pid_control">
         <button type="" class="button btn-pid-down" id="pid_down" name=""></button>
         <button type="" class="button btn-pid-up" id="pid_up" name=""></button>
         <div class="pid_lable">Установка глубины</div>
         <div id="target_depth" class="pid_target_depth"> 0.0 </div>
-      </div>       -->
+      </div>      
+
       <div id="depth" class="depth-class">Глубина: ---</div>
       <div id="pitch" class="pitch-class">Дифферент: ---</div>
       <div id="heading" class="heading-class">Курс: ---</div>
@@ -49,14 +58,14 @@
       <!-- <div class="image-bar"></div>
       <div class="image-bar-point"></div> -->
       
-      <!-- <div class="pid_switch">
+      <div class="pid_switch">
         <label class="pid_lable">Удержание глубины</label>
         <div class="buttonss r" id="button-1">
-          <input type="checkbox" class="checkbox" />
+          <input type="checkbox" class="checkbox" id="button-ch"/>
           <div class="knobs"></div>
           <div class="layer"></div>
         </div>
-      </div> -->
+      </div>
       
       <div id="settings" class="settings_block">
         <h2 class="blockname">Настройки портов</h2>
@@ -71,14 +80,8 @@
         
       </div>
 
-      <div id="missions" class="mission_block">
+      <!-- <div id="missions" class="mission_block">
         <h2 class="blockname">Создание миссий</h2>
-        <!-- <div class="settings_grid" id="settings_grid">
-          
-        </div> -->
-        <!-- <div class="mission_description">
-          <p class="descript_h">Mission</p>
-        </div> -->
         <div class="json-editor">
           <div id="description">
             <div class="custom-scrollbar">
@@ -129,10 +132,6 @@
                 }</pre>
                 <p> <b>"angle": value</b> - Поворот -левый\+правый.</p>
                 <p> Нулевой угол считается от угла при старте миссии.</p>
-              <!-- <p> <b>"axis_y": value</b> - Поворот -вниз\+вверх.</p>
-              <p> <b>"axis_z": value</b> - Поворот +вправо\-влево.</p>
-              <p> <b>"time": value</b> - Время выполнение команды в секундах.</p> -->
-
               <h3>Ожидание по таймеру (Waiting): </h3>
               <pre class="code">
                 "Waiting": {
@@ -185,9 +184,7 @@
           </div>
           <textarea id="json-text" rows="10" cols="50"></textarea>
           <div id="message"></div>
-          <!-- <button id="download-button"><img src="download-icon.png" alt="Download"></button> -->
           <button class="ssm_butt" id="upload-button">
-            <!-- <img src="/static/img/arrow_down.png" alt="Upload"> -->
             Upload
           </button>
           <button class="ssm_butt" id="format-button">Format</button>
@@ -195,21 +192,19 @@
           
           
         </div>
-        <!-- <div class="setting_buttons">
-          <button class="settings_upload button_set" id="settings_upload"> Обновить </button>
-          <button class="settings_save button_set" id="settings_save"> Сохранить </button>
-        </div> -->
         
-        
-      </div>
+      </div> -->
 
       <div class="name">TRIONIX</div>
-      <div id="joyDivLeft" class="joy_left"></div>
-      <div id="joyDivRight" class="joy_rigth"></div>
+      <div id="joy_screen">
+        <div id="joyDivLeft" class="joy_left"></div>
+        <div id="joyDivRight" class="joy_rigth"></div>
+      </div>
     </div>
 
     <script type="text/javascript" src="./static/js/fullscreen.js" ></script>
-    <script type="module" src="./static/js/main_g.js"></script>
+    <!-- <script type="module" src="./static/js/main_g.js"></script> -->
+    <script type="module" src="./static/js/main.js"></script>
     <!-- <script type="text/javascript" src="./static/js/IMU.js"></script> -->
     </body>
 </html>

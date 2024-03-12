@@ -347,7 +347,7 @@ select::-ms-expand {
 
 /* #### Video position ### */
 
-#videoCanvas{
+#videoImage{
     object-fit: cover;
     width: 100%;
     height: 100%;
@@ -368,6 +368,7 @@ select::-ms-expand {
 }
 
 /* Joys */
+
 #joyDivRight {
     width: max(15vw, 15vh);
     height: max(15vw, 15vh);
@@ -389,6 +390,9 @@ select::-ms-expand {
     right: 80%;
 }
 
+#joy_screen{
+  display: block;
+}
 
 /* #joystick {
     height: 300px;
@@ -592,13 +596,7 @@ button{
     inset 0 2px 0 rgba(0, 0, 0, .1);
 } */
 
-.btn-photo{
-    background: url("../img/photo.png") center center no-repeat;
-    background-size: 50% 50%;
-    background-color: #faf5f58c;
-    position: absolute;
-    top: 5%;
-}
+
 
 .btn-fullscreen{
     background: url('../img/fullscreen.png') center center no-repeat;
@@ -616,16 +614,72 @@ button{
     background-color: #faf5f58c;
     opacity: .5;
     position: absolute;
-    left: 93%;
+    left: 94%;
     top: 15%;
 }
- 
+
+/* .btn-grab{} */
+
+.slidecontainer {
+  width: 25vw;
+  left: 70%;
+  top: 90%;
+  position: absolute;
+}
+
+/* The slider itself */
+.btn-grab {
+  -webkit-appearance: none;  /* Override default CSS styles */
+  appearance: none;
+  width: 100%; /* Full-width */
+  height: 2vh;
+  border-radius: 10px; 
+  background: #d3d3d3; /* Grey background */
+  outline: none; /* Remove outline */
+  opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+  -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+  transition: opacity .2s;
+}
+
+/* Mouse-over effects */
+.btn-grab:hover {
+  opacity: 1; /* Fully shown on mouse-over */
+}
+
+/* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+.btn-grab::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+  width: 2vw; /* Set a specific slider handle width */
+  height: 2vw; /* Slider handle height */
+  border-radius: 50%; 
+  background: #868686; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+.btn-grab::-moz-range-thumb {
+  width: 3vw; /* Set a specific slider handle width */
+  height: 3vw; /* Slider handle height */
+  background: #607a7a; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+.btn-photo{
+    background: url("../img/photo.png") center center no-repeat;
+    background-size: 50% 50%;
+    background-color: #faf5f58c;
+    position: absolute;
+    left: 80%;
+    top: 15%;
+}
+
 .btn-rec{
     background: url('../img/red.png') center center no-repeat;
     background-size: 35% 35%;
     background-color: #faf5f58c;
     position: absolute;
-    top: 20%;
+    left: 87%;
+    top: 15%;
 }
 
 .pid_control{
@@ -738,9 +792,9 @@ button{
 
 .heading-class{
   /* align-items: center; */
-  width: 34vw;
+  width: 24vw;
   position: absolute;
-  left: 33vw;
+  left: 38vw;
   top: 0.5%; 
   padding: 0.8%;
   background-color: #faf5f5c3;
@@ -807,7 +861,7 @@ button:fullscreen{
     background-size: 50% 50%;
     background-color: #faf5f58c;
     position: absolute;
-    top: 5%;
+    top: 15%;
 }
 
 .btn-fullscreen:fullscreen{
@@ -826,7 +880,7 @@ button:fullscreen{
     background-color: #faf5f58c;
     opacity: .5;
     position: absolute;
-    left: 93%;
+    left: 94%;
     top: 15%;
 }
 
@@ -835,7 +889,7 @@ button:fullscreen{
     background-size: 35% 35%;
     background-color: #faf5f58c;
     position: absolute;
-    top: 20%;
+    top: 15%;
 }
 
 .btn-pid-up:fullscreen{
@@ -910,7 +964,7 @@ button:fullscreen{
     height: 100%;
 }
 
-#videoCanvas:fullscreen{
+#videoImage:fullscreen{
     object-fit: cover;
     width: 100%;
     height: 100%;
@@ -948,6 +1002,12 @@ button:fullscreen{
         font-size: 1.2em;
     }
 
+    .heading-class{
+      border-radius: 10px;
+      font-size: 1.2em;
+
+    }
+
     .depth-class {
         border-radius: 10px;
         font-size: 1.2em;
@@ -965,7 +1025,7 @@ button:fullscreen{
         text-align: center;
     }
 
-    .btn-flashlight {
+    .btn-flashlight{
         background: url(../img/light.png) center center no-repeat;
         background-size: 60% 60%;
         background-color: #faf5f58c;
@@ -973,6 +1033,24 @@ button:fullscreen{
         position: absolute;
         left: 76vw;
         top: 1vh;
+    }
+
+    .btn-photo{
+      background: url("../img/photo.png") center center no-repeat;
+      background-size: 50% 50%;
+      background-color: #faf5f58c;
+      position: absolute;
+      left: 32vw;
+      top: 1vh;
+    }
+  
+    .btn-rec{
+      background: url('../img/red.png') center center no-repeat;
+      background-size: 35% 35%;
+      background-color: #faf5f58c;
+      position: absolute;
+      left: 26vw;
+      top: 1vh;
     }
 
     #button-1 .knobs:before {

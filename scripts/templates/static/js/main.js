@@ -5,6 +5,7 @@ var  ws_url = 'ws://0.0.0.0:9090';
 
 let control_type = "web"
 let mission_stat_vel = 0
+let video_status = 0
 
 
 var ros = new ROSLIB.Ros({
@@ -41,10 +42,10 @@ var teleop_status = new ROSLIB.Param({
     name : 'control_type'
 });
 
-teleop_status.get(function(data) {
-    console.log('control_type: ' + data);
-    control_type = data;
-});
+// teleop_status.get(function(data) {
+//     console.log('control_type: ' + data);
+//     control_type = data;
+// });
 
 var mission_status = new ROSLIB.Param({
     ros : ros,
@@ -56,10 +57,26 @@ mission_status.get(function(data) {
     mission_stat_vel = data;
 });
 
+var teleop_status = new ROSLIB.Param({
+    ros : ros,
+    name : 'video_status'
+});
+
+teleop_status.get(function(data) {
+    console.log('video_status: ' + data);
+    video_status = data;
+});
+
 var mission_publisher = new ROSLIB.Topic({
     ros: ros,
     name: '/sm_msg',
     messageType: 'std_msgs/String'
+});
+
+var cam_comm_publisher = new ROSLIB.Topic({
+    ros: ros,
+    name: '/cam_writer_command',
+    messageType: 'std_msgs/Int16'
 });
 
 var mission_load_signal = new ROSLIB.Topic({
@@ -81,6 +98,12 @@ var cmd_publisher = new ROSLIB.Topic({
 var light_publisher = new ROSLIB.Topic({
     ros: ros,
     name: '/light',
+    messageType: 'std_msgs/Float64'
+});
+
+var manipulator_publisher = new ROSLIB.Topic({
+    ros: ros,
+    name: '/manipulator',
     messageType: 'std_msgs/Float64'
 });
 
@@ -108,19 +131,26 @@ var pid_switch = new ROSLIB.Service({
     serviceType: 'std_srvs/SetBool'
 });
 
-// ##########    Publish param #########
+// ##########    Joy Contol    #########
 
-var stat_flash = false
-var stat_of_rec = false
+// var stat_flash = false
+// var stat_of_rec = false
 const MAX_FORWARD = 0.01
 const MAX_BACKWARD = 0.01
 const MAX_DOWN = 0.01
 const MAX_UP = 0.01
-const MAX_ANGULAR = 0.01
+const MAX_ANGULAR = 0.001
+const MAX_PITCH_ANGULAR = 0.01
 let thr_config_name
 let thr_config_position
 let mission = []
 
+const G_MAX_FORWARD_BACKWARD = -10
+// const G_MAX_BACKWARD = 1
+const G_MAX_UP_DOWN = -10
+// const G_MAX_UP = 1
+const G_MAX_ANGULAR = 0.15
+const G_MAX_PITCH_ANGULAR = 0.2
 
 var joy_right = new JoyStick('joyDivRight', {
     "title": "joystick_right",
@@ -138,9 +168,14 @@ var joy_left = new JoyStick('joyDivLeft', {
     "externalLineWidth": "5"
 });
 
-setInterval(function () { control(); }, 200);
+setInterval(function () { control(); }, 100);
 
 
+let up_down = 0
+let left_right = 0
+let forward_backward = 0
+let pitch_moment_down = 0
+let pitch_moment_up = 0
 
 function control() {
     if (control_type == 'web'){
@@ -162,13 +197,133 @@ function control() {
             // torque: {
             angular: {
                 // y: up_down > 0 ? -(up_down * MAX_UP) : -(up_down * MAX_DOWN),
-                z: (left_right / 10 * MAX_ANGULAR)
+                z: (left_right * MAX_ANGULAR)
             }
         });
         cmd_publisher.publish(cmd)
     // console.log(cmd)
     }
+    if (control_type == 'web_joy'){
+        gameLoop()
+        up_down = axList[1]
+        left_right = axList[2]
+        forward_backward = axList[3]
+        pitch_moment_down = butList[6]
+        pitch_moment_up = butList[7]
+
+        var cmd = new ROSLIB.Message({        
+            // force: {
+            linear: {
+                x: forward_backward > 0 ? forward_backward * G_MAX_FORWARD_BACKWARD : forward_backward * G_MAX_FORWARD_BACKWARD ,
+                z: up_down > 0 ? (up_down * G_MAX_UP_DOWN) : (up_down * G_MAX_UP_DOWN )
+            },
+            // torque: {
+            angular: {
+                y: pitch_moment_down * G_MAX_PITCH_ANGULAR + pitch_moment_up * G_MAX_PITCH_ANGULAR * -1,
+                z: (left_right * G_MAX_ANGULAR )
+            }
+        });
+        cmd_publisher.publish(cmd)
+
+        // if (butList[1]){
+        //     light();
+        // }
+        // if (butList[9]){
+        //     pid_act();
+        // }
+        // if (butList[12]){
+        //     pid_set(-1)
+        // }
+        // if (butList[13]){
+        //     pid_set(1)
+        // }
+                
+    }
 }
+
+setInterval(function () { control_gamepad_but(); }, 200);
+
+function control_gamepad_but(){
+    if (control_type == 'web_joy'){
+        if (butList[1]){
+            light();
+        }
+        if (butList[9]){
+            pid_act();
+        }
+        if (butList[12]){
+            pid_set(-1)
+        }
+        if (butList[13]){
+            pid_set(1)
+        }
+        if (butList[4]){
+            greb(-1)
+        }
+        if (butList[5]){
+            greb(1)
+        }
+    }
+}
+
+// ########       Gamepad Joy      ############
+
+let controllerIndex = null;
+const butList = {};
+let axList = [];
+
+window.addEventListener("gamepadconnected", (event) => {
+  handleConnectDisconnect(event, true);
+  control_type = 'web_joy'
+  teleop_status.set(control_type);
+  document.getElementById('joy_screen').style.display == 'block' ? document.getElementById('joy_screen').style.display = 'none' : document.getElementById('joy_screen').style.display = 'none';
+//   console.log("1");
+//   console.log(document.getElementById('joy_screen').style.display == 'block')
+});
+
+window.addEventListener("gamepaddisconnected", (event) => {
+  handleConnectDisconnect(event, false);
+  control_type = 'web'
+  teleop_status.set(control_type);
+  document.getElementById('joy_screen').style.display == 'none' ? document.getElementById('joy_screen').style.display = 'block' : document.getElementById('joy_screen').style.display = 'none';
+//   console.log("0");
+//   console.log(document.getElementById('joy_screen').style.display == 'none')
+});
+
+function handleConnectDisconnect(event, connected) {
+    const gamepad = event.gamepad;
+    console.log(gamepad);
+
+    if (connected) {
+        controllerIndex = gamepad.index;
+        console.log(gamepad.axes);
+        console.log(gamepad.buttons);
+    } else {
+        controllerIndex = null;
+    }
+}
+
+function gameList(listax, listd){
+    for (const prop in listd){
+      butList[prop] = listd[prop].value;
+    }
+    // console.log(butList);
+    axList = listax;
+    // console.log(axList);
+  }
+
+function gameLoop() {
+  if (controllerIndex !== null) {
+    const gamepad = navigator.getGamepads()[controllerIndex];
+    // handleButtons(gamepad.buttons);
+    // handleSticks(gamepad.axes);
+    // handleRumble(gamepad);    
+    gameList(gamepad.axes, gamepad.buttons);
+  }
+  requestAnimationFrame(gameLoop);
+}
+
+    //  gameLoop();
 
 
 // ########### Subs ##############
@@ -219,7 +374,7 @@ let mission_read = function(msg){
 
 
 var depth = 0.0
-var stat_pidr = false;
+let stat_pidr = false;
 
 depth_subscriber.subscribe(function(msg) {
     document.getElementById('depth').textContent="Глубина: " + (msg.data.toFixed(2));
@@ -229,39 +384,42 @@ pitch_subscriber.subscribe(function(msg) {
     document.getElementById('pitch').textContent="Дифферент: " + (msg.data.toFixed(2));
 });
 
-document.getElementById('button-1').onclick = function(){
-    this.stat_pidr = !this.stat_pidr
+function pid_act(){
+    stat_pidr = !stat_pidr
     var pidr_request = new ROSLIB.ServiceRequest({
-        data: this.stat_pidr ? true : false
+        data: stat_pidr ? true : false
     });
     pid_switch.callService(pidr_request, function(result) {
-        console.log(result)
-    })
-    console.log('send pid request')
+        // console.log(result)
+    });
+    // console.log('send pid request');
+    if (control_type == 'web_joy'){
+        document.getElementById('button-ch').checked ? document.getElementById('button-ch').checked = false : document.getElementById('button-ch').checked = true;
+    }
 }
 
-document.getElementById('pid_down').onclick = function(){
-    
-    depth = depth - 0.1;
-    depth = Math.max(depth, 0.0);
+document.getElementById('button-1').onclick = function(){
+    pid_act();
+}
+
+function pid_set(kk){
+    depth = depth + (0.05 * kk);
+    depth = Math.min(10.0, Math.max(depth, 0.0));
     const msg = new ROSLIB.Message({
         data: depth
     })
-    document.getElementById('target_depth').textContent = depth.toFixed(1);
+    document.getElementById('target_depth').textContent = depth.toFixed(2);
     // console.log("<")
     pid_setpoint.publish(msg)
 }
 
+document.getElementById('pid_down').onclick = function(){
+    pid_set(-1);
+}
+
 
 document.getElementById('pid_up').onclick = function(){
-    depth = depth + 0.1;
-    depth = Math.min(10.0, depth);
-    const msg = new ROSLIB.Message({
-        data: depth
-    })
-    document.getElementById('target_depth').textContent = depth.toFixed(1);
-    // console.log(">")
-    pid_setpoint.publish(msg)
+    pid_set(1);
 }
 
 
@@ -282,6 +440,7 @@ thr_data_subscriber.subscribe(function(msg){
 });
 
 let setting_block = document.getElementById('settings_grid');
+
 let thr_list_generation = function(){
     while (setting_block.firstChild) {
         setting_block.removeChild(setting_block.lastChild);
@@ -364,13 +523,13 @@ document.getElementById('settings_upload').onclick = function(){
 
 document.getElementById('main_screen').onclick = function(){
     document.getElementById('settings').style.display == 'block' ? document.getElementById('settings').style.display = 'none' : document.getElementById('settings').style.display = 'none';
-    document.getElementById('missions').style.display == 'block' ? document.getElementById('missions').style.display = 'none' : document.getElementById('missions').style.display = 'none';
+    // document.getElementById('missions').style.display == 'block' ? document.getElementById('missions').style.display = 'none' : document.getElementById('missions').style.display = 'none';
     document.getElementById('black_page').style.display == 'block' ? document.getElementById('black_page').style.display = 'none' : document.getElementById('black_page').style.display = 'none';
     document.getElementById('menu__toggle').checked = false;
 }
 
 document.getElementById('settings_screen').onclick = function(){
-    document.getElementById('missions').style.display == 'block' ? document.getElementById('missions').style.display = 'none' : document.getElementById('missions').style.display = 'none';
+    // document.getElementById('missions').style.display == 'block' ? document.getElementById('missions').style.display = 'none' : document.getElementById('missions').style.display = 'none';
     document.getElementById('settings').style.display == 'block' ? document.getElementById('settings').style.display = 'block' : document.getElementById('settings').style.display = 'block';
     document.getElementById('black_page').style.display == 'block' ? document.getElementById('black_page').style.display = 'block' : document.getElementById('black_page').style.display = 'block';
     document.getElementById('menu__toggle').checked = false;
@@ -383,22 +542,9 @@ document.getElementById('settings_screen').onclick = function(){
 
 
   
-  
-
-
-// document.getElementById('settings_screen').onclick = function(){
-//     const save_data = new ROSLIB.Message({
-//         data: 1
-//     })
-//     get_thr_data_publisher.publish()
-// }
 
 
 // ######## SCREEN CONTROLE ########
-
-
-
-
 
 // let nameDiv = document.createElement('div');
 // nameDiv.className = 'thrust_name';
@@ -435,122 +581,224 @@ document.getElementById('settings_screen').onclick = function(){
 
 // ########## Video ##########
 
-var image_subscriber = new ROSLIB.Topic({
+// var image_subscriber = new ROSLIB.Topic({
+//     ros: ros,
+//     name: '/image_raw/compressed',
+//     messageType: 'sensor_msgs/CompressedImage'
+// });
+
+// var canvas = document.getElementById("videoCanvas");
+// canvas.width = window.innerWidth;
+// canvas.height = window.innerHeight;
+
+// image_subscriber.subscribe(function (message) {
+//     var canvas = document.getElementById("videoCanvas");
+//     var ctx = canvas.getContext("2d");
+
+//     var img = new Image();
+//     img.src = "data:image/jpeg;base64," + message.data;
+//     img.onload = function () {
+//         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+//     };
+// });
+
+
+let image_subscriber = new ROSLIB.Topic({
     ros: ros,
     name: '/image_raw/compressed',
     messageType: 'sensor_msgs/CompressedImage'
 });
 
-var canvas = document.getElementById("videoCanvas");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+var videoImage = document.getElementById("videoImage");
+var img = new Image();
 
-image_subscriber.subscribe(function (message) {
-    var canvas = document.getElementById("videoCanvas");
-    var ctx = canvas.getContext("2d");
+image_subscriber.subscribe(function(message) {
 
-    var img = new Image();
     img.src = "data:image/jpeg;base64," + message.data;
     img.onload = function () {
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        videoImage.src = img.src;
     };
 });
 
 
-document.getElementById('flashlight').onclick = function(){
-    this.stat_flash = !this.stat_flash
-    var stat;
-    this.stat_flash ? stat = 150 : stat = 0;
+// ##############     Additional options     #################
+
+let stat_flash = [0, 50, 150, 250];
+let stat_flash_id = 0 
+
+function light(){
+    if (stat_flash.length -2 < stat_flash_id){
+        stat_flash_id = 0;
+    } else {
+        stat_flash_id++;
+    }
     var cmd = new ROSLIB.Message({
-        data: stat
-        // data: this.stat_flash ? 150 : 0
+        data: stat_flash[stat_flash_id]
     });
 
     light_publisher.publish(cmd);
-    console.log(stat);
+    // console.log(stat_flash_id);
 }
 
+document.getElementById('flashlight').onclick = function(){
+    light();    
+}
 
+let manipulator = 0
 
-// ########      State_Machine      #########
+function greb(v){
+    manipulator = Math.min(100, Math.max(manipulator + 5 * v, 0));
+    document.getElementById('trionixGrab').value = manipulator;
 
-setInterval(function () { control(); }, 1000);
-let update_status = function(){
-    mission_status.get(function(data) {
-        // console.log('mission_status: ' + data);
-        mission_stat_vel = data;
-    }); 
-    teleop_status.get(function(data) {
-        // console.log('control_type: ' + data);
-        control_type = data;
+    var cmd = new ROSLIB.Message({
+        data: Math.floor(manipulator)
     });
-};
-
-document.getElementById('mission_screen').onclick = function(){
-    document.getElementById('missions').style.display == 'block' ? document.getElementById('missions').style.display = 'block' : document.getElementById('missions').style.display = 'block';
-    document.getElementById('settings').style.display == 'block' ? document.getElementById('settings').style.display = 'none' : document.getElementById('settings').style.display = 'none';
-    document.getElementById('black_page').style.display == 'block' ? document.getElementById('black_page').style.display = 'block' : document.getElementById('black_page').style.display = 'block';
-    document.getElementById('menu__toggle').checked = false;
-    mission_load_signal.publish()
+    manipulator_publisher.publish(cmd);
 }
 
-let ssm_pub = function(dat){
-    const mis_str = JSON.stringify(dat);
-    var mission_dat = new ROSLIB.Message({
-        data: mis_str
+document.getElementById('trionixGrab').onclick = function(){
+    manipulator = document.getElementById('trionixGrab').value;
+    
+    var cmd = new ROSLIB.Message({
+        data: Math.floor(manipulator)
     });
-    mission_publisher.publish(mission_dat);
-    console.log("pub");
+    manipulator_publisher.publish(cmd);
+    // console.log(cmd);
 }
 
-document.getElementById('upload-button').addEventListener('click', function() {
-    var jsonText = document.getElementById('json-text').value;
-    try {
-      var jsonData = JSON.parse(jsonText);
-      // Действия с данными JSON
-      ssm_pub(jsonData);
-      console.log("ssm_publ");
-      document.getElementById('message').innerText = 'Mission upload successfully';
-      document.getElementById('message').classList.remove('error');
-      document.getElementById('message').classList.add('success');
+
+
+function video_rec(){
+    if (video_status != 1){
+        document.getElementById('rec').style.backgroundColor = "#d31e1e8c";
+        video_status = 1;
+        var cmd = new ROSLIB.Message({
+            data: 1
+        });
+        cam_comm_publisher.publish(cmd)
+    } else {
+        video_status = 3;
+        document.getElementById('rec').style.backgroundColor = "#faf5f58c";
+        var cmd = new ROSLIB.Message({
+            data: 3
+        });
+        cam_comm_publisher.publish(cmd)
+    }
+}
+
+document.getElementById('rec').onclick = function(){
+    video_rec();
+}
+
+function photo(){
+    var cmd = new ROSLIB.Message({
+        data: 5
+    });
+    cam_comm_publisher.publish(cmd)
+    // console.log(cmd)
+}
+
+document.getElementById('photo').onclick = function(){
+    photo();
+}
+
+// // ########      State_Machine      #########
+
+// setInterval(function () { control(); }, 1000);
+// let update_status = function(){
+//     mission_status.get(function(data) {
+//         // console.log('mission_status: ' + data);
+//         mission_stat_vel = data;
+//     }); 
+//     teleop_status.get(function(data) {
+//         // console.log('control_type: ' + data);
+//         control_type = data;
+//     });
+// };
+
+// document.getElementById('mission_screen').onclick = function(){
+//     document.getElementById('missions').style.display == 'block' ? document.getElementById('missions').style.display = 'block' : document.getElementById('missions').style.display = 'block';
+//     document.getElementById('settings').style.display == 'block' ? document.getElementById('settings').style.display = 'none' : document.getElementById('settings').style.display = 'none';
+//     document.getElementById('black_page').style.display == 'block' ? document.getElementById('black_page').style.display = 'block' : document.getElementById('black_page').style.display = 'block';
+//     document.getElementById('menu__toggle').checked = false;
+//     mission_load_signal.publish()
+// }
+
+// let ssm_pub = function(dat){
+//     const mis_str = JSON.stringify(dat);
+//     var mission_dat = new ROSLIB.Message({
+//         data: mis_str
+//     });
+//     mission_publisher.publish(mission_dat);
+//     console.log("pub");
+// }
+
+// document.getElementById('upload-button').addEventListener('click', function() {
+//     var jsonText = document.getElementById('json-text').value;
+//     try {
+//       var jsonData = JSON.parse(jsonText);
+//       // Действия с данными JSON
+//       ssm_pub(jsonData);
+//       console.log("ssm_publ");
+//       document.getElementById('message').innerText = 'Mission upload successfully';
+//       document.getElementById('message').classList.remove('error');
+//       document.getElementById('message').classList.add('success');
       
-      mission_stat_vel = 1
-      mission_status.set(mission_stat_vel)
-    } catch (error) {
-      document.getElementById('message').innerText = 'Error: Invalid mission format';
-      document.getElementById('message').classList.remove('success');
-      document.getElementById('message').classList.add('error');
-    }
-  });
+//       mission_stat_vel = 1
+//       mission_status.set(mission_stat_vel)
+//     } catch (error) {
+//       document.getElementById('message').innerText = 'Error: Invalid mission format';
+//       document.getElementById('message').classList.remove('success');
+//       document.getElementById('message').classList.add('error');
+//     }
+//   });
 
-  document.getElementById('mission-start-button').addEventListener('click', function() {
-    // if (mission_stat_vel == 0){
-    //     mission_stat_vel = 1;
-    //     mission_status.set(mission_stat_vel);
-    // } else{
-    // mission_stat_vel = 2;
-    // mission_status.set(mission_stat_vel);
-    // }
-    control_type = "sm"
-    teleop_status.set(control_type)
-    teleop_start.callService();
-    console.log("Start Mission!")
-  });
+//   document.getElementById('mission-start-button').addEventListener('click', function() {
+//     // if (mission_stat_vel == 0){
+//     //     mission_stat_vel = 1;
+//     //     mission_status.set(mission_stat_vel);
+//     // } else{
+//     // mission_stat_vel = 2;
+//     // mission_status.set(mission_stat_vel);
+//     // }
+//     control_type = "sm"
+//     teleop_status.set(control_type)
+//     teleop_start.callService();
+//     console.log("Start Mission!")
+//   });
   
-  document.getElementById('format-button').addEventListener('click', function() {
-    var jsonText = document.getElementById('json-text').value;
-    try {
-      var formattedJson = JSON.stringify(JSON.parse(jsonText), null, 2);
-      document.getElementById('json-text').value = formattedJson;
-      document.getElementById('message').innerText = 'Mission formatted successfully';
-      document.getElementById('message').classList.remove('error');
-      document.getElementById('message').classList.add('success');
-    } catch (error) {
-      document.getElementById('message').innerText = 'Error: Invalid mission format';
-      document.getElementById('message').classList.remove('success');
-      document.getElementById('message').classList.add('error');
-    }
-  });
+//   document.getElementById('format-button').addEventListener('click', function() {
+//     var jsonText = document.getElementById('json-text').value;
+//     try {
+//       var formattedJson = JSON.stringify(JSON.parse(jsonText), null, 2);
+//       document.getElementById('json-text').value = formattedJson;
+//       document.getElementById('message').innerText = 'Mission formatted successfully';
+//       document.getElementById('message').classList.remove('error');
+//       document.getElementById('message').classList.add('success');
+//     } catch (error) {
+//       document.getElementById('message').innerText = 'Error: Invalid mission format';
+//       document.getElementById('message').classList.remove('success');
+//       document.getElementById('message').classList.add('error');
+//     }
+//   });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // let control_type_switch = function(){
@@ -590,9 +838,3 @@ document.getElementById('upload-button').addEventListener('click', function() {
 // });
 
 
-// document.getElementById('rec').onclick = function(){
-//     this.stat_of_rec = !this.stat_of_rec
-//     let recval = new XMLHttpRequest();
-//     recval.open('GET', '/record?date_from_Nick_Kapustin=' + (this.stat_of_rec ? 1 : 0), true);
-//     recval.send();
-// }
