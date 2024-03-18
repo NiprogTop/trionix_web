@@ -1,7 +1,7 @@
-// var  ws_url = 'ws://192.168.1.100:9090';
+var  ws_url = 'ws://192.168.1.100:9090';
 // var  ws_url = 'ws://192.168.1.47:9090';
 // var  ws_url = 'ws://192.168.1.101:9090';
-var  ws_url = 'ws://0.0.0.0:9090';
+// var  ws_url = 'ws://0.0.0.0:9090';
 
 let control_type = "web"
 let mission_stat_vel = 0
@@ -145,12 +145,29 @@ let thr_config_name
 let thr_config_position
 let mission = []
 
-const G_MAX_FORWARD_BACKWARD = -10
+let G_MAX_FORWARD_BACKWARD = [-0.25, -10, -10] // -1 
 // const G_MAX_BACKWARD = 1
-const G_MAX_UP_DOWN = -10
+let G_MAX_UP_DOWN = [-0.4, -0.5, -10] // -1 
 // const G_MAX_UP = 1
-const G_MAX_ANGULAR = 0.15
-const G_MAX_PITCH_ANGULAR = 0.2
+let G_MAX_ANGULAR = [0.08, 0.15, 0.08] // 0.15 
+let G_MAX_PITCH_ANGULAR = [0.2, 0.2, 0.2] //0.2
+
+let G_K_id = 0 
+let G_K_color = ['green', 'yellow' ,'red']
+
+function G_mode(){
+    if (G_MAX_FORWARD_BACKWARD.length -2 < G_K_id){
+        G_K_id = 0;
+    } else {
+        G_K_id++;
+    }
+    console.log(G_K_id);
+    document.getElementById('mode').style.backgroundColor = G_K_color[G_K_id]
+}
+
+document.getElementById('mode').onclick = function(){
+    G_mode();
+}
 
 var joy_right = new JoyStick('joyDivRight', {
     "title": "joystick_right",
@@ -214,13 +231,13 @@ function control() {
         var cmd = new ROSLIB.Message({        
             // force: {
             linear: {
-                x: forward_backward > 0 ? forward_backward * G_MAX_FORWARD_BACKWARD : forward_backward * G_MAX_FORWARD_BACKWARD ,
-                z: up_down > 0 ? (up_down * G_MAX_UP_DOWN) : (up_down * G_MAX_UP_DOWN )
+                x: forward_backward > 0 ? forward_backward * G_MAX_FORWARD_BACKWARD[G_K_id] : forward_backward * G_MAX_FORWARD_BACKWARD[G_K_id] ,
+                z: up_down > 0 ? (up_down * G_MAX_UP_DOWN[G_K_id]) : (up_down * G_MAX_UP_DOWN[G_K_id] )
             },
             // torque: {
             angular: {
-                y: pitch_moment_down * G_MAX_PITCH_ANGULAR + pitch_moment_up * G_MAX_PITCH_ANGULAR * -1,
-                z: (left_right * G_MAX_ANGULAR )
+                y: pitch_moment_down * G_MAX_PITCH_ANGULAR[G_K_id] + pitch_moment_up * G_MAX_PITCH_ANGULAR[G_K_id] * -1,
+                z: (left_right * G_MAX_ANGULAR[G_K_id] )
             }
         });
         cmd_publisher.publish(cmd)
@@ -248,6 +265,10 @@ function control_gamepad_but(){
         if (butList[1]){
             light();
         }
+        if (butList[3]){
+            photo();
+            // light();
+        }
         if (butList[9]){
             pid_act();
         }
@@ -263,6 +284,13 @@ function control_gamepad_but(){
         if (butList[5]){
             greb(1)
         }
+        if (butList[8]){
+            G_mode()
+        }
+        if (butList[0]){
+            depth_change();
+        }
+        
     }
 }
 
@@ -374,10 +402,12 @@ let mission_read = function(msg){
 
 
 var depth = 0.0
+let depth_real = 0.0
 let stat_pidr = false;
 
 depth_subscriber.subscribe(function(msg) {
     document.getElementById('depth').textContent="Глубина: " + (msg.data.toFixed(2));
+    depth_real = msg.data.toFixed(2);
 });
 
 pitch_subscriber.subscribe(function(msg) {
@@ -411,6 +441,17 @@ function pid_set(kk){
     document.getElementById('target_depth').textContent = depth.toFixed(2);
     // console.log("<")
     pid_setpoint.publish(msg)
+}
+
+function depth_change(){
+
+    const msg = new ROSLIB.Message({
+        data: depth_real
+    });
+    document.getElementById('target_depth').textContent = depth_real;
+    // console.log("<")
+    pid_setpoint.publish(msg);
+    console.log(depth_real);
 }
 
 document.getElementById('pid_down').onclick = function(){
@@ -525,12 +566,14 @@ document.getElementById('main_screen').onclick = function(){
     document.getElementById('settings').style.display == 'block' ? document.getElementById('settings').style.display = 'none' : document.getElementById('settings').style.display = 'none';
     // document.getElementById('missions').style.display == 'block' ? document.getElementById('missions').style.display = 'none' : document.getElementById('missions').style.display = 'none';
     document.getElementById('black_page').style.display == 'block' ? document.getElementById('black_page').style.display = 'none' : document.getElementById('black_page').style.display = 'none';
+    document.getElementById('photo_galary').style.display == 'block' ? document.getElementById('photo_galary').style.display = 'none' : document.getElementById('photo_galary').style.display = 'none';
     document.getElementById('menu__toggle').checked = false;
 }
 
 document.getElementById('settings_screen').onclick = function(){
     // document.getElementById('missions').style.display == 'block' ? document.getElementById('missions').style.display = 'none' : document.getElementById('missions').style.display = 'none';
     document.getElementById('settings').style.display == 'block' ? document.getElementById('settings').style.display = 'block' : document.getElementById('settings').style.display = 'block';
+    document.getElementById('photo_galary').style.display == 'none' ? document.getElementById('photo_galary').style.display = 'none' : document.getElementById('photo_galary').style.display = 'none';
     document.getElementById('black_page').style.display == 'block' ? document.getElementById('black_page').style.display = 'block' : document.getElementById('black_page').style.display = 'block';
     document.getElementById('menu__toggle').checked = false;
     // const save_data = new ROSLIB.Message({
@@ -539,6 +582,17 @@ document.getElementById('settings_screen').onclick = function(){
     get_thr_data_publisher.publish()
 }
 
+document.getElementById('photo_screen').onclick = function(){
+    // document.getElementById('missions').style.display == 'block' ? document.getElementById('missions').style.display = 'none' : document.getElementById('missions').style.display = 'none';
+    document.getElementById('settings').style.display == 'none' ? document.getElementById('settings').style.display = 'none' : document.getElementById('settings').style.display = 'none';
+    document.getElementById('photo_galary').style.display == 'block' ? document.getElementById('photo_galary').style.display = 'block' : document.getElementById('photo_galary').style.display = 'block';
+    document.getElementById('black_page').style.display == 'block' ? document.getElementById('black_page').style.display = 'block' : document.getElementById('black_page').style.display = 'block';
+    document.getElementById('menu__toggle').checked = false;
+    // const save_data = new ROSLIB.Message({
+    //     data: 1
+    // })
+    // get_thr_data_publisher.publish()
+}
 
 
   
@@ -581,44 +635,55 @@ document.getElementById('settings_screen').onclick = function(){
 
 // ########## Video ##########
 
-// var image_subscriber = new ROSLIB.Topic({
-//     ros: ros,
-//     name: '/image_raw/compressed',
-//     messageType: 'sensor_msgs/CompressedImage'
-// });
-
-// var canvas = document.getElementById("videoCanvas");
-// canvas.width = window.innerWidth;
-// canvas.height = window.innerHeight;
-
-// image_subscriber.subscribe(function (message) {
-//     var canvas = document.getElementById("videoCanvas");
-//     var ctx = canvas.getContext("2d");
-
-//     var img = new Image();
-//     img.src = "data:image/jpeg;base64," + message.data;
-//     img.onload = function () {
-//         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-//     };
-// });
-
-
-let image_subscriber = new ROSLIB.Topic({
+var image_subscriber = new ROSLIB.Topic({
     ros: ros,
     name: '/image_raw/compressed',
     messageType: 'sensor_msgs/CompressedImage'
 });
 
-var videoImage = document.getElementById("videoImage");
-var img = new Image();
+var canvas = document.getElementById("videoCanvas");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-image_subscriber.subscribe(function(message) {
+image_subscriber.subscribe(function (message) {
+    var canvas = document.getElementById("videoCanvas");
+    var ctx = canvas.getContext("2d");
 
+    var img = new Image();
     img.src = "data:image/jpeg;base64," + message.data;
     img.onload = function () {
-        videoImage.src = img.src;
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     };
 });
+
+
+
+// let image_subscriber = new ROSLIB.Topic({
+//     ros: ros,
+//     name: '/image_raw/compressed',
+//     messageType: 'sensor_msgs/CompressedImage'
+// });
+
+// var videoImage = document.getElementById("videoImage");
+
+// image_subscriber.subscribe(function(message) {
+//     updateVideoFrame(message);
+// });
+
+// function updateVideoFrame(data) {
+//     let imageData = "data:image/jpeg;base64," + data.data; // Предполагается, что кадры в формате JPEG
+//     videoImage.src = imageData;
+// }
+
+
+
+// image_subscriber.subscribe(function(message) {
+
+//     img.src = "data:image/jpeg;base64," + message.data;
+//     img.onload = function () {
+//         videoImage.src = img.src;
+//     };
+// });
 
 
 // ##############     Additional options     #################
@@ -663,7 +728,7 @@ document.getElementById('trionixGrab').onclick = function(){
         data: Math.floor(manipulator)
     });
     manipulator_publisher.publish(cmd);
-    // console.log(cmd);
+    console.log(cmd);
 }
 
 
@@ -686,9 +751,9 @@ function video_rec(){
     }
 }
 
-document.getElementById('rec').onclick = function(){
-    video_rec();
-}
+// document.getElementById('rec').onclick = function(){
+//     video_rec();
+// }
 
 function photo(){
     var cmd = new ROSLIB.Message({

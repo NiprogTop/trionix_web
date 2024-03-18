@@ -11,6 +11,10 @@ html{
   --darkgray: #2c3e50;
 }
 
+a {
+  text-decoration: none;
+}
+
 * {
     -webkit-tap-highlight-color: transparent;
   }
@@ -347,6 +351,12 @@ select::-ms-expand {
 
 /* #### Video position ### */
 
+#videoCanvas{
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
 #videoImage{
     object-fit: cover;
     width: 100%;
@@ -682,6 +692,15 @@ button{
     top: 15%;
 }
 
+.btn-mode{
+  /* background: url('../img/red.png') center center no-repeat; */
+  background-size: 35% 35%;
+  background-color: green;
+  position: absolute;
+  left: 87%;
+  top: 15%;
+}
+
 .pid_control{
     position: absolute;
     left: 80vw;
@@ -891,6 +910,13 @@ button:fullscreen{
     position: absolute;
     top: 15%;
 }
+.btn-mode:fullscreen {
+  /* background: url('../img/red.png') center center no-repeat; */
+  background-size: 35% 35%;
+  background-color: green;
+  position: absolute;
+  top: 15%;
+}
 
 .btn-pid-up:fullscreen{
     background-size: 50% 50%;
@@ -970,6 +996,11 @@ button:fullscreen{
     height: 100%;
 }
 
+#videoCanvas:fullscreen{
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
 
 
 @media (max-width: 1080px){
@@ -1048,6 +1079,15 @@ button:fullscreen{
       background: url('../img/red.png') center center no-repeat;
       background-size: 35% 35%;
       background-color: #faf5f58c;
+      position: absolute;
+      left: 26vw;
+      top: 1vh;
+    }
+
+    .btn-mode{
+      /* background: url('../img/red.png') center center no-repeat; */
+      background-size: 35% 35%;
+      background-color: green;
       position: absolute;
       left: 26vw;
       top: 1vh;
@@ -1323,3 +1363,164 @@ textarea {
     /* background-position: 0% 0;  */
     /* z-index: ; */
   }
+
+
+
+
+/* ###################     PHOTO_GALARY    ########################### */
+
+#photo_galary{
+  display: none;
+  z-index: 9;
+  /* background-color: #2d2d30; */
+  position: absolute;
+  height: 100vh;
+  width: 100vw;
+  align-content: center;
+  /* top: 10vh; */
+  /* left:20vw; */
+  /* border: solid 5px rgb(102, 102, 102); */
+  border-radius: 15px;
+}
+
+#photo_galary .blockname{
+  /* position: relative; */
+  color: #eeeeee;
+  font-size: 1.8em;
+  font-weight: 600;
+  text-transform: uppercase;
+  width: auto;
+  text-align: center;
+  padding: 1.5vh 0 0 0;
+  /* border: solid 3px #03f437; */
+  /* align-content: center; */
+}
+
+#photo_galary .photo-grid{
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2vh 1vw;
+    padding: 2vh 0;
+}
+
+.photo-container {
+  padding: 1vh 1vw;
+    text-align: center;
+    color: #d3d3d3;
+    font-size: 1.0em;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.image-name{
+  padding:  1vh 0;
+}
+
+
+.image-preview {
+    max-width: 100%;
+    max-height: 150px;
+    border-radius: 5px;
+}
+
+/* .button-container {
+    /* margin-top: 10px; } */
+
+
+.download-button, .delete-button {
+    padding: 0.5vh 1vw;
+    margin: 0 0.5vw;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    color: #d3d3d3;
+    font-size: 1.0em;
+    font-weight: 600;
+    text-transform: uppercase;
+    border-radius: 5px;
+}
+
+.download-button {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.delete-button {
+    background-color: #f44336;
+    color: white;
+}
+
+.load-button {
+    position: fixed;
+    bottom: 2vh;
+    left: 3vw;
+    color: white;
+    background-color: #4CAF50;
+    align-items: center;
+    padding: 2vh 1vw;
+    font-size: 1.8em;
+    font-weight: bold;
+    border-radius: 15px;
+}
+
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    overflow: auto;
+    align-content: center;
+}
+
+.modal-content {
+    margin: auto;
+    display: block;
+    padding-top: 7vh;
+    width: 80vw;
+    /* max-width: 80vw; */
+    /* max-height: 80%; */
+}
+
+.close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: white;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.prev, .next {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    width: auto;
+    padding: 16px;
+    margin-top: -50px;
+    color: white;
+    font-weight: bold;
+    font-size: 20px;
+    transition: 0.6s ease;
+    border-radius: 0 3px 3px 0;
+    user-select: none;
+}
+
+.prev {
+    left: 0;
+    border-radius: 3px 0 0 3px;
+}
+
+.next {
+    right: 0;
+    border-radius: 3px 0 0 3px;
+}
+
+.prev:hover, .next:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
