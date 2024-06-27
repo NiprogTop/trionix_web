@@ -24,7 +24,7 @@ ros.on('close', function() {
 console.log('Connection to websocket server closed.');
 });
 
-// ######  Publish topics and serbvice  ######  
+// ######  Publish topics and serbvice  ######
 
 var teleop_start =  new ROSLIB.Service({
     ros : ros,
@@ -145,12 +145,12 @@ let thr_config_name
 let thr_config_position
 let mission = []
 
-let G_MAX_FORWARD_BACKWARD = [-0.25, -10, -10] // -1 
+let G_MAX_FORWARD_BACKWARD = [-0.35, -0.65, -1.0] // -1 
 // const G_MAX_BACKWARD = 1
-let G_MAX_UP_DOWN = [-0.4, -0.5, -10] // -1 
+let G_MAX_UP_DOWN = [-0.4, -0.6, -1.0] // -1 
 // const G_MAX_UP = 1
-let G_MAX_ANGULAR = [0.08, 0.15, 0.08] // 0.15 
-let G_MAX_PITCH_ANGULAR = [0.2, 0.2, 0.2] //0.2
+let G_MAX_ANGULAR = [0.07, 0.08, 0.05] // 0.15 
+let G_MAX_PITCH_ANGULAR = [0.1, 0.1, 0.1] //0.2
 
 let G_K_id = 0 
 let G_K_color = ['green', 'yellow' ,'red']
@@ -185,7 +185,7 @@ var joy_left = new JoyStick('joyDivLeft', {
     "externalLineWidth": "5"
 });
 
-setInterval(function () { control(); }, 100);
+
 
 
 let up_down = 0
@@ -194,11 +194,13 @@ let forward_backward = 0
 let pitch_moment_down = 0
 let pitch_moment_up = 0
 
+setInterval(function () { control(); }, 100);
+
 function control() {
     if (control_type == 'web'){
-        var up_down = joy_left.GetY()    
-        var left_right = joy_right.GetX()
-        var forward_backward = joy_right.GetY()
+        up_down = joy_left.GetY()
+        left_right = joy_right.GetX()
+        forward_backward = joy_right.GetY()
         
         // if ((left_right < 0.2) || (left_right > -0.2)){
         //     left_right = 0;
@@ -220,11 +222,13 @@ function control() {
         cmd_publisher.publish(cmd)
     // console.log(cmd)
     }
-    if (control_type == 'web_joy'){
+    if (control_type == 'web_joy_1'){
         gameLoop()
-        up_down = axList[1]
-        left_right = axList[2]
-        forward_backward = axList[3]
+
+        up_down = smooth_force( up_down, axList[1])
+        left_right = smooth_force(left_right, axList[2])
+        forward_backward = smooth_force(forward_backward, axList[3])
+        // console.log(forward_backward)
         pitch_moment_down = butList[6]
         pitch_moment_up = butList[7]
 
@@ -240,73 +244,204 @@ function control() {
                 z: (left_right * G_MAX_ANGULAR[G_K_id] )
             }
         });
-        cmd_publisher.publish(cmd)
-
-        // if (butList[1]){
-        //     light();
-        // }
-        // if (butList[9]){
-        //     pid_act();
-        // }
-        // if (butList[12]){
-        //     pid_set(-1)
-        // }
-        // if (butList[13]){
-        //     pid_set(1)
-        // }
-                
+        cmd_publisher.publish(cmd)                
     }
-}
-
-setInterval(function () { control_gamepad_but(); }, 200);
-
-function control_gamepad_but(){
     if (control_type == 'web_joy'){
-        if (butList[1]){
-            light();
-        }
-        if (butList[3]){
-            photo();
-            // light();
-        }
-        if (butList[9]){
-            pid_act();
-        }
-        if (butList[12]){
-            pid_set(-1)
-        }
-        if (butList[13]){
-            pid_set(1)
-        }
-        if (butList[4]){
-            greb(-1)
-        }
-        if (butList[5]){
-            greb(1)
-        }
-        if (butList[8]){
-            G_mode()
-        }
-        if (butList[0]){
-            depth_change();
-        }
-        
+        gameLoop2()
+        gamepadAPI.update()
+        gamepadAPI.control_gamepad_but();
+        up_down = smooth_force( up_down, gamepadAPI.axesStatus[1])
+        left_right = smooth_force(left_right, gamepadAPI.axesStatus[2])
+        forward_backward = smooth_force(forward_backward, gamepadAPI.axesStatus[3])
+        // console.log(forward_backward)
+        pitch_moment_down = butList[6]
+        pitch_moment_up = butList[7]
+
+        var cmd = new ROSLIB.Message({        
+            // force: {
+            linear: {
+                x: forward_backward > 0 ? forward_backward * G_MAX_FORWARD_BACKWARD[G_K_id] : forward_backward * G_MAX_FORWARD_BACKWARD[G_K_id] ,
+                z: up_down > 0 ? (up_down * G_MAX_UP_DOWN[G_K_id]) : (up_down * G_MAX_UP_DOWN[G_K_id] )
+            },
+            // torque: {
+            angular: {
+                y: pitch_moment_down * G_MAX_PITCH_ANGULAR[G_K_id] + pitch_moment_up * G_MAX_PITCH_ANGULAR[G_K_id] * -1,
+                z: (left_right * G_MAX_ANGULAR[G_K_id] )
+            }
+        });
+        cmd_publisher.publish(cmd)                
     }
 }
+
+// setInterval(function () { gamepadAPI.control_gamepad_but(); }, 200);
+
+
+const FORCE_STEP = 0.2
+
+// const f = 1
+function smooth_force(real_f, f){
+    // real_f = 0;
+    // console.log(real_f);
+    if ((f - real_f) > FORCE_STEP){real_f = real_f + FORCE_STEP}
+    else if ((f - real_f) * -1 > FORCE_STEP){real_f = real_f - FORCE_STEP}
+    else {real_f = f};
+    return real_f;
+}
+
+// function control_gamepad_but(){
+//     if (control_type == 'web_joy'){
+//         if (butList[1]){
+//             light();
+//         }
+//         if (butList[3]){
+//             photo();
+//             // light();
+//         }
+//         if (butList[9]){
+//             pid_act();
+//         }
+//         if (butList[12]){
+//             pid_set(-1)
+//         }
+//         if (butList[13]){
+//             pid_set(1)
+//         }
+//         if (butList[4]){
+//             greb(-1)
+//         }
+//         if (butList[5]){
+//             greb(1)
+//         }
+//         if (butList[8]){
+//             G_mode()
+//         }
+//         if (butList[0]){
+//             depth_change();
+//         }
+        
+//     }
+// }
 
 // ########       Gamepad Joy      ############
+
+// setInterval(function () { control(); }, 100);
+// setInterval(function () { gamepadAPI.update(); }, 1000);
 
 let controllerIndex = null;
 const butList = {};
 let axList = [];
 
+let gamepadAPI = {
+	controller: {},
+	turbo: false,
+	connect: function(evt) {
+		gamepadAPI.controller = evt.gamepad;
+		gamepadAPI.turbo = true;
+		console.log('Gamepad connected.');
+	},
+	disconnect: function(evt) {
+		gamepadAPI.turbo = false;
+		delete gamepadAPI.controller;
+		console.log('Gamepad disconnected.');
+	},
+	update: function() {
+		gamepadAPI.buttonsCache = [];
+		for(var k=0; k<gamepadAPI.buttonsStatus.length; k++) {
+			gamepadAPI.buttonsCache[k] = gamepadAPI.buttonsStatus[k];
+		}
+		gamepadAPI.buttonsStatus = [];
+		var c = gamepadAPI.controller || {};
+		var pressed = [];
+		if(c.buttons) {
+			for(var b=0,t=c.buttons.length; b<t; b++) {
+				if(c.buttons[b].pressed) {
+					pressed.push(gamepadAPI.buttons[b]);
+				}
+			}
+		}
+		var axes = [];
+		if(c.axes) {
+			for(var a=0,x=c.axes.length; a<x; a++) {
+				axes.push(c.axes[a].toFixed(2));
+			}
+		}
+		gamepadAPI.axesStatus = axes;
+		gamepadAPI.buttonsStatus = pressed;
+        console.log(gamepadAPI.axesStatus);
+        // console.log(gamepadAPI.buttonsCache);
+        // console.log(gamepadAPI.buttonsStatus);
+        // console.log(gamepadAPI.buttonPressed("select", 0));
+		return pressed;
+	},
+	buttonPressed: function(button, hold) {
+		var newPress = false;
+		for(var i=0,s=gamepadAPI.buttonsStatus.length; i<s; i++) {
+			if(gamepadAPI.buttonsStatus[i] == button) {
+				newPress = true;
+				if(!hold) {
+					for(var j=0,p=gamepadAPI.buttonsCache.length; j<p; j++) {
+						if(gamepadAPI.buttonsCache[j] == button) {
+							newPress = false;
+						}
+					}
+				}
+			}
+		}
+		return newPress;
+	},
+	buttons: [ // XBox360 layout
+		'A','B','---','X',
+		'Y','----','LB','RB',
+		'LT','RT','select','start','-','LJ','RJ',
+	],
+	buttonsCache: [],
+	buttonsStatus: [],
+	axesStatus: [],
+
+    control_gamepad_but(){
+        if (control_type == 'web_joy'){
+            if (gamepadAPI.buttonPressed("B", 0)){
+                light();
+            }
+            if (gamepadAPI.buttonPressed("A", 0)){
+                photo();
+            }
+            if (gamepadAPI.buttonPressed("start", 0)){
+                pid_act();
+            }
+            if (gamepadAPI.axesStatus[7] < 0){
+                pid_set(-1)
+            }
+            if (gamepadAPI.axesStatus[7] > 0){
+                pid_set(1)
+            }
+            if (gamepadAPI.buttonPressed("LB", "hold")){
+                greb(-1)
+            }
+            if (gamepadAPI.buttonPressed("RB", "hold")){
+                greb(1)
+            }
+            if (gamepadAPI.buttonPressed("select", 0)){
+                G_mode()
+            }
+            if (gamepadAPI.buttonPressed("Y", "hold")){
+                depth_change();
+            }
+            
+        }
+    }
+};
+
+// window.addEventListener("gamepadconnected", gamepadAPI.connect);
+// window.addEventListener("gamepaddisconnected", gamepadAPI.disconnect);
+  
+
 window.addEventListener("gamepadconnected", (event) => {
   handleConnectDisconnect(event, true);
-  control_type = 'web_joy'
+//   const gamepad = event.gamepad;
+  control_type = 'web_joy';
   teleop_status.set(control_type);
   document.getElementById('joy_screen').style.display == 'block' ? document.getElementById('joy_screen').style.display = 'none' : document.getElementById('joy_screen').style.display = 'none';
-//   console.log("1");
-//   console.log(document.getElementById('joy_screen').style.display == 'block')
 });
 
 window.addEventListener("gamepaddisconnected", (event) => {
@@ -314,8 +449,6 @@ window.addEventListener("gamepaddisconnected", (event) => {
   control_type = 'web'
   teleop_status.set(control_type);
   document.getElementById('joy_screen').style.display == 'none' ? document.getElementById('joy_screen').style.display = 'block' : document.getElementById('joy_screen').style.display = 'none';
-//   console.log("0");
-//   console.log(document.getElementById('joy_screen').style.display == 'none')
 });
 
 function handleConnectDisconnect(event, connected) {
@@ -351,7 +484,14 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 
-    //  gameLoop();
+function gameLoop2() {
+    if (controllerIndex !== null) {
+      gamepadAPI.controller = navigator.getGamepads()[controllerIndex];
+    }
+    requestAnimationFrame(gameLoop2);
+  }
+  
+//  gameLoop();
 
 
 // ########### Subs ##############
@@ -366,6 +506,17 @@ var pitch_subscriber = new ROSLIB.Topic({
     ros: ros,
     name: '/pitch',
     messageType: 'std_msgs/Float64'
+});
+
+
+var heading_subscriber = new ROSLIB.Topic({
+    ros: ros,
+    name: '/heading',
+    messageType: 'std_msgs/Float64'
+});
+
+heading_subscriber.subscribe(function(msg) {
+    // document.getElementById('heading').textContent="Курс: " + (msg.data.toFixed(2));
 });
 
 
@@ -408,6 +559,7 @@ let stat_pidr = false;
 depth_subscriber.subscribe(function(msg) {
     document.getElementById('depth').textContent="Глубина: " + (msg.data.toFixed(2));
     depth_real = msg.data.toFixed(2);
+    depth_real = parseFloat(depth_real);
 });
 
 pitch_subscriber.subscribe(function(msg) {
@@ -444,10 +596,11 @@ function pid_set(kk){
 }
 
 function depth_change(){
-
+    
     const msg = new ROSLIB.Message({
         data: depth_real
     });
+    depth = depth_real;
     document.getElementById('target_depth').textContent = depth_real;
     // console.log("<")
     pid_setpoint.publish(msg);
@@ -635,26 +788,27 @@ document.getElementById('photo_screen').onclick = function(){
 
 // ########## Video ##########
 
-var image_subscriber = new ROSLIB.Topic({
-    ros: ros,
-    name: '/image_raw/compressed',
-    messageType: 'sensor_msgs/CompressedImage'
-});
+// var image_subscriber = new ROSLIB.Topic({
+//     ros: ros,
+//     name: '/image_raw/compressed',
+//     // name: '/raspicam_node/image/compressed',
+//     messageType: 'sensor_msgs/CompressedImage'
+// });
 
-var canvas = document.getElementById("videoCanvas");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+// var canvas = document.getElementById("videoCanvas");
+// canvas.width = window.innerWidth;
+// canvas.height = window.innerHeight;
 
-image_subscriber.subscribe(function (message) {
-    var canvas = document.getElementById("videoCanvas");
-    var ctx = canvas.getContext("2d");
+// image_subscriber.subscribe(function (message) {
+//     var canvas = document.getElementById("videoCanvas");
+//     var ctx = canvas.getContext("2d");
 
-    var img = new Image();
-    img.src = "data:image/jpeg;base64," + message.data;
-    img.onload = function () {
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    };
-});
+//     var img = new Image();
+//     img.src = "data:image/jpeg;base64," + message.data;
+//     img.onload = function () {
+//         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+//     };
+// });
 
 
 
@@ -709,7 +863,7 @@ document.getElementById('flashlight').onclick = function(){
     light();    
 }
 
-let manipulator = 0
+let manipulator = 50
 
 function greb(v){
     manipulator = Math.min(100, Math.max(manipulator + 5 * v, 0));
@@ -719,16 +873,21 @@ function greb(v){
         data: Math.floor(manipulator)
     });
     manipulator_publisher.publish(cmd);
+    console.log(cmd);
 }
 
-document.getElementById('trionixGrab').onclick = function(){
+
+setInterval(function () { greb_auto(); }, 500);
+
+
+function greb_auto(){
     manipulator = document.getElementById('trionixGrab').value;
     
     var cmd = new ROSLIB.Message({
         data: Math.floor(manipulator)
     });
     manipulator_publisher.publish(cmd);
-    console.log(cmd);
+    // console.log("touch: " + cmd);
 }
 
 
@@ -760,7 +919,7 @@ function photo(){
         data: 5
     });
     cam_comm_publisher.publish(cmd)
-    // console.log(cmd)
+    // console.log(cmd + " photo")
 }
 
 document.getElementById('photo').onclick = function(){
@@ -820,7 +979,7 @@ document.getElementById('photo').onclick = function(){
 
 //   document.getElementById('mission-start-button').addEventListener('click', function() {
 //     // if (mission_stat_vel == 0){
-//     //     mission_stat_vel = 1;
+//     //     mission_stat_vel = 1; 
 //     //     mission_status.set(mission_stat_vel);
 //     // } else{
 //     // mission_stat_vel = 2;
