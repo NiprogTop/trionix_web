@@ -265,10 +265,11 @@ function control() {
             },
             // torque: {
             angular: {
-                y: pitch_moment_down * G_MAX_PITCH_ANGULAR[G_K_id] + pitch_moment_up * G_MAX_PITCH_ANGULAR[G_K_id] * -1,
+                // y: pitch_moment_down * G_MAX_PITCH_ANGULAR[G_K_id] + pitch_moment_up * G_MAX_PITCH_ANGULAR[G_K_id] * -1,
                 z: (left_right * G_MAX_ANGULAR[G_K_id] )
             }
         });
+        // console.log(cmd)
         cmd_publisher.publish(cmd)                
     }
 }
@@ -367,7 +368,7 @@ let gamepadAPI = {
 		}
 		gamepadAPI.axesStatus = axes;
 		gamepadAPI.buttonsStatus = pressed;
-        console.log(gamepadAPI.axesStatus);
+        // console.log(gamepadAPI.axesStatus);
         // console.log(gamepadAPI.buttonsCache);
         // console.log(gamepadAPI.buttonsStatus);
         // console.log(gamepadAPI.buttonPressed("select", 0));
@@ -389,11 +390,17 @@ let gamepadAPI = {
 		}
 		return newPress;
 	},
-	buttons: [ // XBox360 layout
-		'A','B','---','X',
-		'Y','----','LB','RB',
-		'LT','RT','select','start','-','LJ','RJ',
-	],
+	// buttons: [ // XBox360 layout
+	// 	'A','B','---','X',
+	// 	'Y','----','LB','RB',
+	// 	'LT','RT','select','start','-','LJ','RJ',
+	// ],
+    buttons: [ // PG-9076 linux layout
+    'A','B','X','Y',
+    'LB','RB','LT','RT',
+    'select','start','--','---',
+    'up','down','left','right',
+    ],
 	buttonsCache: [],
 	buttonsStatus: [],
 	axesStatus: [],
@@ -409,18 +416,31 @@ let gamepadAPI = {
             if (gamepadAPI.buttonPressed("start", 0)){
                 pid_act();
             }
+
             if (gamepadAPI.axesStatus[7] < 0){
-                pid_set(-1)
+                pid_set(-1);
             }
             if (gamepadAPI.axesStatus[7] > 0){
-                pid_set(1)
+                pid_set(1);
             }
-            if (gamepadAPI.buttonPressed("LB", "hold")){
-                greb(-1)
+
+            if (gamepadAPI.buttonPressed("up", "hold")){
+                // console.log("+up");
+                pid_set(-1);
             }
-            if (gamepadAPI.buttonPressed("RB", "hold")){
-                greb(1)
+
+            if (gamepadAPI.buttonPressed("down", "hold")){
+                // console.log("down-");
+                pid_set(1);
             }
+
+
+            // if (gamepadAPI.buttonPressed("LB", "hold")){
+            //     greb(-1)
+            // }
+            // if (gamepadAPI.buttonPressed("RB", "hold")){
+            //     greb(1)
+            // }
             if (gamepadAPI.buttonPressed("select", 0)){
                 G_mode()
             }
@@ -516,7 +536,7 @@ var heading_subscriber = new ROSLIB.Topic({
 });
 
 heading_subscriber.subscribe(function(msg) {
-    // document.getElementById('heading').textContent="Курс: " + (msg.data.toFixed(2));
+    document.getElementById('heading').textContent="Курс: " + (msg.data.toFixed(2));
 });
 
 
@@ -591,7 +611,7 @@ function pid_set(kk){
         data: depth
     })
     document.getElementById('target_depth').textContent = depth.toFixed(2);
-    // console.log("<")
+    // console.log(depth);
     pid_setpoint.publish(msg)
 }
 
@@ -877,18 +897,18 @@ function greb(v){
 }
 
 
-setInterval(function () { greb_auto(); }, 500);
+// setInterval(function () { greb_auto(); }, 500);
 
 
-function greb_auto(){
-    manipulator = document.getElementById('trionixGrab').value;
+// function greb_auto(){
+//     manipulator = document.getElementById('trionixGrab').value;
     
-    var cmd = new ROSLIB.Message({
-        data: Math.floor(manipulator)
-    });
-    manipulator_publisher.publish(cmd);
-    // console.log("touch: " + cmd);
-}
+//     var cmd = new ROSLIB.Message({
+//         data: Math.floor(manipulator)
+//     });
+//     manipulator_publisher.publish(cmd);
+//     // console.log("touch: " + cmd);
+// }
 
 
 
