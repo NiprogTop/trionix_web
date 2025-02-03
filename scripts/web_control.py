@@ -3,7 +3,7 @@
 
 # PORT = 8009
 DIRECTORY = "/home/coder/trionix_ws/src/trionix_web/scripts/templates/"
-IP = "192.168.1.100"
+# IP = "192.168.1.100"
 # IP = "192.168.0.143"
 IP = "0.0.0.0"
 
@@ -38,13 +38,6 @@ def run(server_class=HTTPServer, handler_class=Handler):
     server_address = ('', 8000)
     httpd = server_class(server_address, handler_class)
     return httpd
-
-# def videoCb(msg):
-#     global bag, record
-#     if (bag is not None) and record:
-#         bag.write('/image_raw/compressed', msg) # /cam/...
-
-# rospy.Subscriber('/image_raw/compressed', CompressedImage, videoCb)
 
 
 if __name__ == "__main__":  

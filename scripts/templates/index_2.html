@@ -3,20 +3,16 @@
   <head>
     <meta charset="utf-8">
     <title>Trionix</title>
-    <link rel="icon" type="image/x-icon" href="./static/img/Icon.svg">
     <link rel="stylesheet" type="text/css" href="./static/style/reset.css">
     <link rel="stylesheet" type="text/css" href="./static/style/main.css">
+    <link rel="manifest" href="../jspwa.webmanifest" />
     <script type="text/javascript" src="./static/js/roslib.min.js" ></script>
     <script type="text/javascript" src="./static/js/joy.js"></script>    
-    <script type="text/javascript" src="./static/js/galary.js"></script>
-
+    <!-- <script type="text/javascript" src="./static/js/galary.js"></script> -->
   </head>
   <body>
     <div class="container1">
       <img id="videoImage" src="http://192.168.1.100:8090/?action=stream" >
-      <!-- <video id="videoImage" autoplay></video> -->
-      <!-- <video id="video-player" autoplay></video> -->
-      <!-- <canvas id="videoCanvas" class="video_stream"> -->
     </div>
     
     <div id="rotate">Поверните устройство!</div>
@@ -27,58 +23,23 @@
       <div class="hamburger-menu">
         
         <input id="menu__toggle" type="checkbox" />
-        <!-- <div class="black_page"></div> -->
-        <!-- <div class="black_page_base" id="black_page"></div> -->
         <label class="menu__btn" for="menu__toggle">
           <span></span>
         </label>
     
         <ul class="menu__box" id="menu__box">
           <li><a class="menu__item"  id="main_screen" href="#">Управление</a></li>
-          <!-- <li><a class="menu__item"  id="mission_screen" href="#">Автономность</a></li> -->
           <li><a class="menu__item"  id="settings_screen" href="#">Настройки</a></li>
-          <li><a class="menu__item"  id="photo_screen" href="#">Галерея</a></li>
         </ul>
       </div>
 
-      <!-- <input type="grab" min="1" max="100" value="0" class="btn-grab" id="myRange"> -->
-      <!-- <div class="slidecontainer">
-        <input type="range" min="1" max="100" value="50" class="btn-grab" id="trionixGrab">
-      </div> -->
-
       <button type="flashlight" class="button btn-flashlight" id="flashlight" name="flashlight"></button>
-      <!-- <button type="rec" class="button btn-rec" id="rec" name="rec"></button> -->
       <button type="mode" class="button btn-mode" id="mode" name="mode"></button>
-      <button type="photo" class="button btn-photo" id="photo" name="photo"></button>
+      <!-- <button type="photo" class="button btn-photo" id="photo" name="photo"></button> -->
       <button type="fullscreen" class="button btn-fullscreen" id="fullscreen" name="fullscreen"></button>
       
-      <div class="pid_control">
-        <button type="" class="button btn-pid-down" id="pid_down" name=""></button>
-        <button type="" class="button btn-pid-up" id="pid_up" name=""></button>
-        <div class="pid_lable">Установка глубины</div>
-        <div id="target_depth" class="pid_target_depth"> 0.0 </div>
-      </div>      
 
-      <div class="grab">
-        <button type="" class="button btn-grab btn-grab_up" id="grab_1" name=""></button>
-        <button type="" class="button btn-grab btn-grab_down"  id="grab_2" name=""></button>
-      </div>
-
-      <div id="depth" class="depth-class">Глубина: ---</div>
-      <div id="pitch" class="pitch-class">Дифферент: ---</div>
       <div id="heading" class="heading-class">Курс: ---</div>
-
-      <!-- <div class="image-bar"></div>
-      <div class="image-bar-point"></div> -->
-      
-      <div class="pid_switch">
-        <label class="pid_lable">Удержание глубины</label>
-        <div class="buttonss r" id="button-1">
-          <input type="checkbox" class="checkbox" id="button-ch"/>
-          <div class="knobs"></div>
-          <div class="layer"></div>
-        </div>
-      </div>
       
       <div id="settings" class="settings_block">
         <h2 class="blockname">Настройки портов</h2>
@@ -108,7 +69,7 @@
         <button onclick="load_p()" class="load-button button_set">Загрузить</button>
       </div>
 
-      <div class="name">TRIONIX</div>
+      <div class="name">TRIONIX_BAG</div>
       <div id="joy_screen">
         <div id="joyDivLeft" class="joy_left"></div>
         <div id="joyDivRight" class="joy_rigth"></div>

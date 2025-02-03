@@ -26,64 +26,64 @@ console.log('Connection to websocket server closed.');
 
 // ######  Publish topics and serbvice  ######
 
-// var teleop_start =  new ROSLIB.Service({
-//     ros : ros,
-//     name : '/state_machine/start',
-//     serviceType : 'std_srvs/Empty'
-// });
+var teleop_start =  new ROSLIB.Service({
+    ros : ros,
+    name : '/state_machine/start',
+    serviceType : 'std_srvs/Empty'
+});
 
 // ros.getParams(function(params) {
 //     console.log(params);
 //     console.log(params['/run_id'])
 // });
 
-// var teleop_status = new ROSLIB.Param({
-//     ros : ros,
-//     name : 'control_type'
-// });
+var teleop_status = new ROSLIB.Param({
+    ros : ros,
+    name : 'control_type'
+});
 
 // teleop_status.get(function(data) {
 //     console.log('control_type: ' + data);
 //     control_type = data;
 // });
 
-// var mission_status = new ROSLIB.Param({
-//     ros : ros,
-//     name : 'mis_status'
-// });
+var mission_status = new ROSLIB.Param({
+    ros : ros,
+    name : 'mis_status'
+});
 
-// mission_status.get(function(data) {
-//     console.log('mission_status: ' + data);
-//     mission_stat_vel = data;
-// });
+mission_status.get(function(data) {
+    console.log('mission_status: ' + data);
+    mission_stat_vel = data;
+});
 
-// var teleop_status = new ROSLIB.Param({
-//     ros : ros,
-//     name : 'video_status'
-// });
+var teleop_status = new ROSLIB.Param({
+    ros : ros,
+    name : 'video_status'
+});
 
-// teleop_status.get(function(data) {
-//     console.log('video_status: ' + data);
-//     video_status = data;
-// });
+teleop_status.get(function(data) {
+    console.log('video_status: ' + data);
+    video_status = data;
+});
 
-// var mission_publisher = new ROSLIB.Topic({
-//     ros: ros,
-//     name: '/sm_msg',
-//     messageType: 'std_msgs/String'
-// });
+var mission_publisher = new ROSLIB.Topic({
+    ros: ros,
+    name: '/sm_msg',
+    messageType: 'std_msgs/String'
+});
 
-// var cam_comm_publisher = new ROSLIB.Topic({
-//     ros: ros,
-//     name: '/cam_writer_command',
-//     messageType: 'std_msgs/Int16'
-// });
+var cam_comm_publisher = new ROSLIB.Topic({
+    ros: ros,
+    name: '/cam_writer_command',
+    messageType: 'std_msgs/Int16'
+});
 
-// var mission_load_signal = new ROSLIB.Topic({
-//     ros: ros,
-//     name: '/sm_msg_signal',
-//     messageType: 'std_msgs/Int16'
-// });
+var mission_load_signal = new ROSLIB.Topic({
+    ros: ros,
+    name: '/sm_msg_signal',
+    messageType: 'std_msgs/Int16'
+});
 
 
 var cmd_publisher = new ROSLIB.Topic({
@@ -107,11 +107,11 @@ var manipulator_publisher = new ROSLIB.Topic({
     messageType: 'std_msgs/Float64'
 });
 
-// var pid_setpoint = new ROSLIB.Topic({
-//     ros: ros,
-//     name: '/pid/depth_pid/setpoint',
-//     messageType: 'std_msgs/Float64'
-// })
+var pid_setpoint = new ROSLIB.Topic({
+    ros: ros,
+    name: '/pid/depth_pid/setpoint',
+    messageType: 'std_msgs/Float64'
+})
 
 var get_thr_data_publisher = new ROSLIB.Topic({
     ros: ros,
@@ -125,20 +125,11 @@ var thr_save_publisher = new ROSLIB.Topic({
     messageType: 'std_msgs/String'
 });
 
-var light_signal_publisher = new ROSLIB.Topic({
+var pid_switch = new ROSLIB.Service({
     ros: ros,
-    name: '/light_signal',
-    messageType: 'std_msgs/Int16'
+    name: '/pid/switch',
+    serviceType: 'std_srvs/SetBool'
 });
-
-// var pid_switch = new ROSLIB.Service({
-//     ros: ros,
-//     name: '/pid/switch',
-//     serviceType: 'std_srvs/SetBool'
-// });
-
-
-
 
 // ##########    Joy Contol    #########
 
@@ -172,7 +163,6 @@ function G_mode(){
     }
     console.log(G_K_id);
     document.getElementById('mode').style.backgroundColor = G_K_color[G_K_id]
-    light_signal_publisher.publish(G_K_id)
 }
 
 document.getElementById('mode').onclick = function(){
@@ -208,16 +198,24 @@ setInterval(function () { control(); }, 100);
 
 function control() {
     if (control_type == 'web'){
+        up_down = joy_left.GetY()
+        left_right = joy_right.GetX()
         forward_backward = joy_right.GetY()
-        left_right = joy_left.GetX()
+        
+        // if ((left_right < 0.2) || (left_right > -0.2)){
+        //     left_right = 0;
+        // }
+    // forward_backward *= 0.5;
 
         var cmd = new ROSLIB.Message({        
             // force: {
             linear: {
-                x: forward_backward > 0 ? forward_backward * G_MAX_FORWARD_BACKWARD[G_K_id] : forward_backward * G_MAX_FORWARD_BACKWARD[G_K_id],
+                x: forward_backward > 0 ? forward_backward * MAX_FORWARD : forward_backward * MAX_BACKWARD,
+                z: up_down > 0 ? (up_down * MAX_UP) : (up_down * MAX_DOWN)
             },
             // torque: {
             angular: {
+                // y: up_down > 0 ? -(up_down * MAX_UP) : -(up_down * MAX_DOWN),
                 z: (left_right * MAX_ANGULAR)
             }
         });
@@ -228,7 +226,7 @@ function control() {
         gameLoop()
 
         up_down = smooth_force( up_down, axList[1])
-        left_right = smooth_force(left_right, axList[0])
+        left_right = smooth_force(left_right, axList[2])
         forward_backward = smooth_force(forward_backward, axList[3])
         // console.log(forward_backward)
         pitch_moment_down = butList[6]
@@ -237,11 +235,13 @@ function control() {
         var cmd = new ROSLIB.Message({        
             // force: {
             linear: {
-                x: forward_backward > 0 ? forward_backward * G_MAX_FORWARD_BACKWARD[G_K_id] : forward_backward * G_MAX_FORWARD_BACKWARD[G_K_id]
+                x: forward_backward > 0 ? forward_backward * G_MAX_FORWARD_BACKWARD[G_K_id] : forward_backward * G_MAX_FORWARD_BACKWARD[G_K_id] ,
+                z: up_down > 0 ? (up_down * G_MAX_UP_DOWN[G_K_id]) : (up_down * G_MAX_UP_DOWN[G_K_id] )
             },
             // torque: {
             angular: {
-                z: (left_right * G_MAX_ANGULAR[G_K_id])
+                y: pitch_moment_down * G_MAX_PITCH_ANGULAR[G_K_id] + pitch_moment_up * G_MAX_PITCH_ANGULAR[G_K_id] * -1,
+                z: (left_right * G_MAX_ANGULAR[G_K_id] )
             }
         });
         cmd_publisher.publish(cmd)                
@@ -250,8 +250,8 @@ function control() {
         gameLoop2()
         gamepadAPI.update()
         gamepadAPI.control_gamepad_but();
-        // up_down = smooth_force( up_down, gamepadAPI.axesStatus[1])
-        left_right = smooth_force(left_right, gamepadAPI.axesStatus[0])
+        up_down = smooth_force( up_down, gamepadAPI.axesStatus[1])
+        left_right = smooth_force(left_right, gamepadAPI.axesStatus[2])
         forward_backward = smooth_force(forward_backward, gamepadAPI.axesStatus[3])
         // console.log(forward_backward)
         pitch_moment_down = butList[6]
@@ -367,7 +367,7 @@ let gamepadAPI = {
 		}
 		gamepadAPI.axesStatus = axes;
 		gamepadAPI.buttonsStatus = pressed;
-        // console.log(gamepadAPI.axesStatus);
+        console.log(gamepadAPI.axesStatus);
         // console.log(gamepadAPI.buttonsCache);
         // console.log(gamepadAPI.buttonsStatus);
         // console.log(gamepadAPI.buttonPressed("select", 0));
@@ -417,9 +417,10 @@ let gamepadAPI = {
             }
             if (gamepadAPI.buttonPressed("LB", "hold")){
                 greb(-1)
-            } else if (gamepadAPI.buttonPressed("RB", "hold")){
+            }
+            if (gamepadAPI.buttonPressed("RB", "hold")){
                 greb(1)
-            } else { greb(0)}
+            }
             if (gamepadAPI.buttonPressed("select", 0)){
                 G_mode()
             }
@@ -565,55 +566,55 @@ pitch_subscriber.subscribe(function(msg) {
     document.getElementById('pitch').textContent="Дифферент: " + (msg.data.toFixed(2));
 });
 
-// function pid_act(){
-//     stat_pidr = !stat_pidr
-//     var pidr_request = new ROSLIB.ServiceRequest({
-//         data: stat_pidr ? true : false
-//     });
-//     pid_switch.callService(pidr_request, function(result) {
-//         // console.log(result)
-//     });
-//     // console.log('send pid request');
-//     if (control_type == 'web_joy'){
-//         document.getElementById('button-ch').checked ? document.getElementById('button-ch').checked = false : document.getElementById('button-ch').checked = true;
-//     }
-// }
+function pid_act(){
+    stat_pidr = !stat_pidr
+    var pidr_request = new ROSLIB.ServiceRequest({
+        data: stat_pidr ? true : false
+    });
+    pid_switch.callService(pidr_request, function(result) {
+        // console.log(result)
+    });
+    // console.log('send pid request');
+    if (control_type == 'web_joy'){
+        document.getElementById('button-ch').checked ? document.getElementById('button-ch').checked = false : document.getElementById('button-ch').checked = true;
+    }
+}
 
-// document.getElementById('button-1').onclick = function(){
-//     pid_act();
-// }
+document.getElementById('button-1').onclick = function(){
+    pid_act();
+}
 
-// function pid_set(kk){
-//     depth = depth + (0.05 * kk);
-//     depth = Math.min(10.0, Math.max(depth, 0.0));
-//     const msg = new ROSLIB.Message({
-//         data: depth
-//     })
-//     document.getElementById('target_depth').textContent = depth.toFixed(2);
-//     // console.log("<")
-//     pid_setpoint.publish(msg)
-// }
+function pid_set(kk){
+    depth = depth + (0.05 * kk);
+    depth = Math.min(10.0, Math.max(depth, 0.0));
+    const msg = new ROSLIB.Message({
+        data: depth
+    })
+    document.getElementById('target_depth').textContent = depth.toFixed(2);
+    // console.log("<")
+    pid_setpoint.publish(msg)
+}
 
-// function depth_change(){
+function depth_change(){
     
-//     const msg = new ROSLIB.Message({
-//         data: depth_real
-//     });
-//     depth = depth_real;
-//     document.getElementById('target_depth').textContent = depth_real;
-//     // console.log("<")
-//     pid_setpoint.publish(msg);
-//     console.log(depth_real);
-// }
+    const msg = new ROSLIB.Message({
+        data: depth_real
+    });
+    depth = depth_real;
+    document.getElementById('target_depth').textContent = depth_real;
+    // console.log("<")
+    pid_setpoint.publish(msg);
+    console.log(depth_real);
+}
 
-// document.getElementById('pid_down').onclick = function(){
-//     pid_set(-1);
-// }
+document.getElementById('pid_down').onclick = function(){
+    pid_set(-1);
+}
 
 
-// document.getElementById('pid_up').onclick = function(){
-//     pid_set(1);
-// }
+document.getElementById('pid_up').onclick = function(){
+    pid_set(1);
+}
 
 
 // ########## Thrusters Data ##########
@@ -718,14 +719,14 @@ document.getElementById('main_screen').onclick = function(){
     document.getElementById('settings').style.display == 'block' ? document.getElementById('settings').style.display = 'none' : document.getElementById('settings').style.display = 'none';
     // document.getElementById('missions').style.display == 'block' ? document.getElementById('missions').style.display = 'none' : document.getElementById('missions').style.display = 'none';
     document.getElementById('black_page').style.display == 'block' ? document.getElementById('black_page').style.display = 'none' : document.getElementById('black_page').style.display = 'none';
-    // document.getElementById('photo_galary').style.display == 'block' ? document.getElementById('photo_galary').style.display = 'none' : document.getElementById('photo_galary').style.display = 'none';
+    document.getElementById('photo_galary').style.display == 'block' ? document.getElementById('photo_galary').style.display = 'none' : document.getElementById('photo_galary').style.display = 'none';
     document.getElementById('menu__toggle').checked = false;
 }
 
 document.getElementById('settings_screen').onclick = function(){
     // document.getElementById('missions').style.display == 'block' ? document.getElementById('missions').style.display = 'none' : document.getElementById('missions').style.display = 'none';
     document.getElementById('settings').style.display == 'block' ? document.getElementById('settings').style.display = 'block' : document.getElementById('settings').style.display = 'block';
-    // document.getElementById('photo_galary').style.display == 'none' ? document.getElementById('photo_galary').style.display = 'none' : document.getElementById('photo_galary').style.display = 'none';
+    document.getElementById('photo_galary').style.display == 'none' ? document.getElementById('photo_galary').style.display = 'none' : document.getElementById('photo_galary').style.display = 'none';
     document.getElementById('black_page').style.display == 'block' ? document.getElementById('black_page').style.display = 'block' : document.getElementById('black_page').style.display = 'block';
     document.getElementById('menu__toggle').checked = false;
     // const save_data = new ROSLIB.Message({
@@ -734,17 +735,17 @@ document.getElementById('settings_screen').onclick = function(){
     get_thr_data_publisher.publish()
 }
 
-// document.getElementById('photo_screen').onclick = function(){
-//     // document.getElementById('missions').style.display == 'block' ? document.getElementById('missions').style.display = 'none' : document.getElementById('missions').style.display = 'none';
-//     document.getElementById('settings').style.display == 'none' ? document.getElementById('settings').style.display = 'none' : document.getElementById('settings').style.display = 'none';
-//     document.getElementById('photo_galary').style.display == 'block' ? document.getElementById('photo_galary').style.display = 'block' : document.getElementById('photo_galary').style.display = 'block';
-//     document.getElementById('black_page').style.display == 'block' ? document.getElementById('black_page').style.display = 'block' : document.getElementById('black_page').style.display = 'block';
-//     document.getElementById('menu__toggle').checked = false;
-//     // const save_data = new ROSLIB.Message({
-//     //     data: 1
-//     // })
-//     // get_thr_data_publisher.publish()
-// }
+document.getElementById('photo_screen').onclick = function(){
+    // document.getElementById('missions').style.display == 'block' ? document.getElementById('missions').style.display = 'none' : document.getElementById('missions').style.display = 'none';
+    document.getElementById('settings').style.display == 'none' ? document.getElementById('settings').style.display = 'none' : document.getElementById('settings').style.display = 'none';
+    document.getElementById('photo_galary').style.display == 'block' ? document.getElementById('photo_galary').style.display = 'block' : document.getElementById('photo_galary').style.display = 'block';
+    document.getElementById('black_page').style.display == 'block' ? document.getElementById('black_page').style.display = 'block' : document.getElementById('black_page').style.display = 'block';
+    document.getElementById('menu__toggle').checked = false;
+    // const save_data = new ROSLIB.Message({
+    //     data: 1
+    // })
+    // get_thr_data_publisher.publish()
+}
 
 
   
@@ -841,7 +842,7 @@ document.getElementById('settings_screen').onclick = function(){
 
 // ##############     Additional options     #################
 
-let stat_flash = [0, 250];
+let stat_flash = [0, 50, 150, 250];
 let stat_flash_id = 0 
 
 function light(){
@@ -862,46 +863,28 @@ document.getElementById('flashlight').onclick = function(){
     light();    
 }
 
-let manipulator = 0
+
+document.getElementById('grapMinus').onclick = function(){
+    greb(-1);    
+}
+
+document.getElementById('grabPlus').onclick = function(){
+    greb(1);   
+}
+
+
+// let manipulator = 50
 
 function greb(v){
-    manipulator = v;
+    // manipulator = Math.min(100, Math.max(manipulator + 5 * v, 0));
     // document.getElementById('trionixGrab').value = manipulator;
-
     var cmd = new ROSLIB.Message({
-        data: Math.floor(manipulator)
+        data: Math.floor(v)
     });
     manipulator_publisher.publish(cmd);
     console.log(cmd);
 }
 
-var counter
-
-document.getElementById('grab_1').onmousedown = function(){
-    greb(-1);
-    counter = setInterval(function() {
-        // wrapper.innerHTML = count;
-        // count++;
-        greb(-1);
-    }, 100);
-}
-document.getElementById('grab_1').onmouseup = function(){
-    clearInterval(counter)
-    greb(0)
-}
-document.getElementById('grab_2').onmouseup= function(){
-    clearInterval(counter)
-    greb(0);
-}
-
-document.getElementById('grab_2').onmousedown = function(){
-    greb(1);
-    counter = setInterval(function() {
-        // wrapper.innerHTML = count;
-        // count++;
-        greb(1);
-    }, 100);
-}
 
 // setInterval(function () { greb_auto(); }, 500);
 
@@ -948,9 +931,9 @@ function photo(){
     // console.log(cmd + " photo")
 }
 
-// document.getElementById('photo').onclick = function(){
-//     photo();
-// }
+document.getElementById('photo').onclick = function(){
+    photo();
+}
 
 // // ########      State_Machine      #########
 
