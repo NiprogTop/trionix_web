@@ -8,7 +8,7 @@ const robot_t = {
 const allRobotArray = Object.values(robot_t);
 
 const elementsForChange = {
-    "main_screen": [robot_t.trionix, robot_t.bag],
+    "main_screen": allRobotArray,
     "mission_screen": [robot_t.guppy],
     "settings_screen": allRobotArray,
     "photo_screen": allRobotArray.filter(type => ![robot_t.bag].includes(type)) // Для всех роботов, кроме "bag"
