@@ -10,6 +10,8 @@
     <script type="text/javascript" src="./static/js/joy.js"></script>    
     <script type="text/javascript" src="./static/js/galary.js"></script>
 
+    <script src="static/js/adaptiveWeb.js" defer></script>
+
   </head>
   <body>
     <div class="container1">
@@ -35,7 +37,7 @@
     
         <ul class="menu__box" id="menu__box">
           <li><a class="menu__item"  id="main_screen" href="#">Управление</a></li>
-          <!-- <li><a class="menu__item"  id="mission_screen" href="#">Автономность</a></li> -->
+          <li><a class="menu__item"  id="mission_screen" href="#">Автономность</a></li>
           <li><a class="menu__item"  id="settings_screen" href="#">Настройки</a></li>
           <li><a class="menu__item"  id="photo_screen" href="#">Галерея</a></li>
         </ul>
@@ -81,6 +83,15 @@
       </div>
       
       <div id="settings" class="settings_block">
+        <div align="center">
+          <h2 align="center" class="blockname">Установить тип робота (ручной режим)</h2>
+          <select id="selectCurRobotType">
+            <option value="trionix">тип ТРИОНИКС</option>
+            <option value="guppy">тип ГУППИ</option>
+            <option value="bag">тип Жук</option>
+          </select>
+        </div>
+        
         <h2 class="blockname">Настройки портов</h2>
         <div class="settings_grid" id="settings_grid">
           
