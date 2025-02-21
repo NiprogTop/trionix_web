@@ -201,21 +201,15 @@ function control() {
         up_down = joy_left.GetY()
         left_right = joy_right.GetX()
         forward_backward = joy_right.GetY()
-        
-        // if ((left_right < 0.2) || (left_right > -0.2)){
-        //     left_right = 0;
-        // }
-    // forward_backward *= 0.5;
 
         var cmd = new ROSLIB.Message({        
             // force: {
             linear: {
-                x: forward_backward > 0 ? forward_backward * MAX_FORWARD : forward_backward * MAX_BACKWARD,
+                x: forward_backward > 0 ? forward_backward * 0.01 * G_MAX_FORWARD_BACKWARD[G_K_id] : forward_backward * 0.01 *  G_MAX_FORWARD_BACKWARD[G_K_id],
                 z: up_down > 0 ? (up_down * MAX_UP) : (up_down * MAX_DOWN)
             },
             // torque: {
             angular: {
-                // y: up_down > 0 ? -(up_down * MAX_UP) : -(up_down * MAX_DOWN),
                 z: (left_right * MAX_ANGULAR)
             }
         });
@@ -226,7 +220,7 @@ function control() {
         gameLoop()
 
         up_down = smooth_force( up_down, axList[1])
-        left_right = smooth_force(left_right, axList[2])
+        left_right = smooth_force(left_right, axList[0])
         forward_backward = smooth_force(forward_backward, axList[3])
         // console.log(forward_backward)
         pitch_moment_down = butList[6]
@@ -235,13 +229,11 @@ function control() {
         var cmd = new ROSLIB.Message({        
             // force: {
             linear: {
-                x: forward_backward > 0 ? forward_backward * G_MAX_FORWARD_BACKWARD[G_K_id] : forward_backward * G_MAX_FORWARD_BACKWARD[G_K_id] ,
-                z: up_down > 0 ? (up_down * G_MAX_UP_DOWN[G_K_id]) : (up_down * G_MAX_UP_DOWN[G_K_id] )
+                x: forward_backward > 0 ? forward_backward * G_MAX_FORWARD_BACKWARD[G_K_id] : forward_backward * G_MAX_FORWARD_BACKWARD[G_K_id]
             },
             // torque: {
             angular: {
-                y: pitch_moment_down * G_MAX_PITCH_ANGULAR[G_K_id] + pitch_moment_up * G_MAX_PITCH_ANGULAR[G_K_id] * -1,
-                z: (left_right * G_MAX_ANGULAR[G_K_id] )
+                z: (left_right * G_MAX_ANGULAR[G_K_id])
             }
         });
         cmd_publisher.publish(cmd)                
@@ -367,7 +359,7 @@ let gamepadAPI = {
 		}
 		gamepadAPI.axesStatus = axes;
 		gamepadAPI.buttonsStatus = pressed;
-        console.log(gamepadAPI.axesStatus);
+        // console.log(gamepadAPI.axesStatus);
         // console.log(gamepadAPI.buttonsCache);
         // console.log(gamepadAPI.buttonsStatus);
         // console.log(gamepadAPI.buttonPressed("select", 0));
@@ -401,7 +393,7 @@ let gamepadAPI = {
     control_gamepad_but(){
         if (control_type == 'web_joy'){
             if (gamepadAPI.buttonPressed("B", 0)){
-                light();console.log(control_type)
+                light();
             }
             if (gamepadAPI.buttonPressed("A", 0)){
                 photo();
@@ -417,10 +409,9 @@ let gamepadAPI = {
             }
             if (gamepadAPI.buttonPressed("LB", "hold")){
                 greb(-1)
-            }
-            if (gamepadAPI.buttonPressed("RB", "hold")){
+            } else if (gamepadAPI.buttonPressed("RB", "hold")){
                 greb(1)
-            }
+            } else { greb(0)}
             if (gamepadAPI.buttonPressed("select", 0)){
                 G_mode()
             }
@@ -516,7 +507,7 @@ var heading_subscriber = new ROSLIB.Topic({
 });
 
 heading_subscriber.subscribe(function(msg) {
-    // document.getElementById('heading').textContent="Курс: " + (msg.data.toFixed(2));
+    document.getElementById('heading').textContent="Курс: " + (msg.data.toFixed(2));
 });
 
 
@@ -842,14 +833,13 @@ document.getElementById('photo_screen').onclick = function(){
 
 // ##############     Additional options     #################
 
-let stat_flash = [0, 50, 150, 250];
+let stat_flash = [0, 40, 90, 150];
 let stat_flash_id = 0 
 
 function light(){
     if (stat_flash.length -2 < stat_flash_id){
         stat_flash_id = 0;
     } else {
-        left_right = joy_right.GetX()
         stat_flash_id++;
     }
     var cmd = new ROSLIB.Message({
@@ -864,41 +854,46 @@ document.getElementById('flashlight').onclick = function(){
     light();    
 }
 
-
-document.getElementById('grapMinus').onclick = function(){
-    greb(-1);    
-}
-
-document.getElementById('grabPlus').onclick = function(){
-    greb(1);   
-}
-
-
-// let manipulator = 50
+let manipulator = 0
 
 function greb(v){
-    // manipulator = Math.min(100, Math.max(manipulator + 5 * v, 0));
+    manipulator = v;
     // document.getElementById('trionixGrab').value = manipulator;
+
     var cmd = new ROSLIB.Message({
-        data: Math.floor(v)
+        data: Math.floor(manipulator)
     });
     manipulator_publisher.publish(cmd);
-    console.log(cmd);
+    // console.log(cmd);
 }
 
+var counter
 
-// setInterval(function () { greb_auto(); }, 500);
+document.getElementById('grab_1').onmousedown = function(){
+    greb(-1);
+    counter = setInterval(function() {
+        // wrapper.innerHTML = count;
+        // count++;
+        greb(-1);
+    }, 100);
+}
+document.getElementById('grab_1').onmouseup = function(){
+    clearInterval(counter)
+    greb(0)
+}
+document.getElementById('grab_2').onmouseup= function(){
+    clearInterval(counter)
+    greb(0);
+}
 
-
-// function greb_auto(){
-//     manipulator = document.getElementById('trionixGrab').value;
-    
-//     var cmd = new ROSLIB.Message({
-//         data: Math.floor(manipulator)
-//     });
-//     manipulator_publisher.publish(cmd);
-//     // console.log("touch: " + cmd);
-// }
+document.getElementById('grab_2').onmousedown = function(){
+    greb(1);
+    counter = setInterval(function() {
+        // wrapper.innerHTML = count;
+        // count++;
+        greb(1);
+    }, 100);
+}
 
 
 
