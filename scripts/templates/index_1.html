@@ -10,6 +10,8 @@
     <script type="text/javascript" src="./static/js/joy.js"></script>    
     <script type="text/javascript" src="./static/js/galary.js"></script>
 
+    <script src="static/js/adaptiveWeb.js" defer></script>
+
   </head>
   <body>
     <div class="container1">
@@ -23,6 +25,18 @@
 
     <div class="black_page_base" id="black_page"></div>
     
+    <div id="mapElement">
+      <div align="center" style="height: 100%;">
+        <iframe width="100%" height="100%" src="PWA and MAP/www/index.html"></iframe>
+      </div>
+    </div>
+
+    <div id="configELement">
+      <div align="center" style="height: 100%;">
+        <iframe width="100%" height="100%" src="PWA and WEB CONFIG/www/index.html"></iframe>
+      </div>
+    </div>
+
     <div class="container buttons">
       <div class="hamburger-menu">
         
@@ -35,9 +49,10 @@
     
         <ul class="menu__box" id="menu__box">
           <li><a class="menu__item"  id="main_screen" href="#">Управление</a></li>
-          <!-- <li><a class="menu__item"  id="mission_screen" href="#">Автономность</a></li> -->
+          <li><a class="menu__item"  id="map_screen" href="#">Карты</a></li>
+          <li><a class="menu__item"  id="config_screen" href="#">Найтрока конфигурации PID</a></li>
+          <li><a class="menu__item"  id="mission_screen" href="#">Автономность</a></li>
           <li><a class="menu__item"  id="settings_screen" href="#">Настройки</a></li>
-          <li><a class="menu__item"  id="photo_screen" href="#">Галерея</a></li>
         </ul>
       </div>
 
@@ -81,6 +96,20 @@
       </div>
       
       <div id="settings" class="settings_block">
+        <div align="center">
+          <h2 align="center" class="blockname">IP адрес робота</h2>
+          <input id="ipRobot" />
+        </div>
+
+        <div align="center">
+          <h2 align="center" class="blockname">Установить тип робота (ручной режим)</h2>
+          <select id="selectCurRobotType">
+            <option value="trionix" selected>тип ТРИОНИКС</option>
+            <option value="guppy">тип ГУППИ</option>
+            <option value="bag">тип Жук</option>
+          </select>
+        </div>
+
         <h2 class="blockname">Настройки портов</h2>
         <div class="settings_grid" id="settings_grid">
           
@@ -89,7 +118,6 @@
           <button class="settings_upload button_set" id="settings_upload"> Обновить </button>
           <button class="settings_save button_set" id="settings_save"> Сохранить </button>
         </div>
-        
         
       </div>
 

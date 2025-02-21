@@ -40,11 +40,11 @@ console.log('Connection to websocket server closed.');
 
 // ######  Publish topics and serbvice  ######
 
-// var teleop_start =  new ROSLIB.Service({
-//     ros : ros,
-//     name : '/state_machine/start',
-//     serviceType : 'std_srvs/Empty'
-// });
+var teleop_start =  new ROSLIB.Service({
+    ros : ros,
+    name : '/state_machine/start',
+    serviceType : 'std_srvs/Empty'
+});
 
 // ros.getParams(function(params) {
 //     console.log(params);
@@ -61,43 +61,43 @@ var teleop_status = new ROSLIB.Param({
 //    control_type = data;
 //});
 
-// var mission_status = new ROSLIB.Param({
-//     ros : ros,
-//     name : 'mis_status'
-// });
+var mission_status = new ROSLIB.Param({
+    ros : ros,
+    name : 'mis_status'
+});
 
-// mission_status.get(function(data) {
-//     console.log('mission_status: ' + data);
-//     mission_stat_vel = data;
-// });
+mission_status.get(function(data) {
+    console.log('mission_status: ' + data);
+    mission_stat_vel = data;
+});
 
-// var teleop_status = new ROSLIB.Param({
-//     ros : ros,
-//     name : 'video_status'
-// });
+var teleop_status = new ROSLIB.Param({
+    ros : ros,
+    name : 'video_status'
+});
 
-// teleop_status.get(function(data) {
-//     console.log('video_status: ' + data);
-//     video_status = data;
-// });
+teleop_status.get(function(data) {
+    console.log('video_status: ' + data);
+    video_status = data;
+});
 
-// var mission_publisher = new ROSLIB.Topic({
-//     ros: ros,
-//     name: '/sm_msg',
-//     messageType: 'std_msgs/String'
-// });
+var mission_publisher = new ROSLIB.Topic({
+    ros: ros,
+    name: '/sm_msg',
+    messageType: 'std_msgs/String'
+});
 
-// var cam_comm_publisher = new ROSLIB.Topic({
-//     ros: ros,
-//     name: '/cam_writer_command',
-//     messageType: 'std_msgs/Int16'
-// });
+var cam_comm_publisher = new ROSLIB.Topic({
+    ros: ros,
+    name: '/cam_writer_command',
+    messageType: 'std_msgs/Int16'
+});
 
-// var mission_load_signal = new ROSLIB.Topic({
-//     ros: ros,
-//     name: '/sm_msg_signal',
-//     messageType: 'std_msgs/Int16'
-// });
+var mission_load_signal = new ROSLIB.Topic({
+    ros: ros,
+    name: '/sm_msg_signal',
+    messageType: 'std_msgs/Int16'
+});
 
 
 var cmd_publisher = new ROSLIB.Topic({
@@ -145,11 +145,11 @@ var light_signal_publisher = new ROSLIB.Topic({
     messageType: 'std_msgs/Int16'
 });
 
-// var pid_switch = new ROSLIB.Service({
-//     ros: ros,
-//     name: '/pid/switch',
-//     serviceType: 'std_srvs/SetBool'
-// });
+var pid_switch = new ROSLIB.Service({
+    ros: ros,
+    name: '/pid/switch',
+    serviceType: 'std_srvs/SetBool'
+});
 
 
 
@@ -186,7 +186,6 @@ function G_mode(){
     }
     console.log(G_K_id);
     document.getElementById('mode').style.backgroundColor = G_K_color[G_K_id]
-    light_signal_publisher.publish(G_K_id)
 }
 
 document.getElementById('mode').onclick = function(){
@@ -222,15 +221,15 @@ setInterval(function () { control(); }, 100);
 
 function control() {
     if (control_type == 'web'){
+        up_down = joy_left.GetY()
+        left_right = joy_right.GetX()
         forward_backward = joy_right.GetY()
-        left_right = joy_left.GetX()
-		up_down = joy_left.GetY()
 
         var cmd = new ROSLIB.Message({        
             // force: {
             linear: {
-                x: forward_backward > 0 ? forward_backward * G_MAX_FORWARD_BACKWARD[G_K_id] : forward_backward * G_MAX_FORWARD_BACKWARD[G_K_id],
-				z: up_down > 0 ? (up_down * G_MAX_UP_DOWN[G_K_id]) : (up_down * G_MAX_UP_DOWN[G_K_id] )
+                x: forward_backward > 0 ? forward_backward * 0.01 * G_MAX_FORWARD_BACKWARD[G_K_id] : forward_backward * 0.01 *  G_MAX_FORWARD_BACKWARD[G_K_id],
+                z: up_down > 0 ? (up_down * MAX_UP) : (up_down * MAX_DOWN)
             },
             // torque: {
             angular: {
@@ -238,7 +237,7 @@ function control() {
             }
         });
         cmd_publisher.publish(cmd)
-    //console.log(cmd)
+    // console.log(cmd)
     }
     if (control_type == 'web_joy_1'){
         gameLoop()
@@ -260,7 +259,6 @@ function control() {
                 z: (left_right * G_MAX_ANGULAR[G_K_id])
             }
         });
-		console.log(cmd)
         cmd_publisher.publish(cmd)                
     }
     if (control_type == 'web_joy'){
@@ -268,7 +266,7 @@ function control() {
         gamepadAPI.update()
         gamepadAPI.control_gamepad_but();
         up_down = smooth_force( up_down, gamepadAPI.axesStatus[1])
-        left_right = smooth_force(left_right, gamepadAPI.axesStatus[0])
+        left_right = smooth_force(left_right, gamepadAPI.axesStatus[2])
         forward_backward = smooth_force(forward_backward, gamepadAPI.axesStatus[3])
         // console.log(forward_backward)
         pitch_moment_down = butList[6]
@@ -282,11 +280,10 @@ function control() {
             },
             // torque: {
             angular: {
-                // y: pitch_moment_down * G_MAX_PITCH_ANGULAR[G_K_id] + pitch_moment_up * G_MAX_PITCH_ANGULAR[G_K_id] * -1,
+                y: pitch_moment_down * G_MAX_PITCH_ANGULAR[G_K_id] + pitch_moment_up * G_MAX_PITCH_ANGULAR[G_K_id] * -1,
                 z: (left_right * G_MAX_ANGULAR[G_K_id] )
             }
         });
-        // console.log(cmd)
         cmd_publisher.publish(cmd)                
     }
 }
@@ -386,7 +383,6 @@ let gamepadAPI = {
 		gamepadAPI.axesStatus = axes;
 		gamepadAPI.buttonsStatus = pressed;
         // console.log(gamepadAPI.axesStatus);
-        // console.log(gamepadAPI.axesStatus);
         // console.log(gamepadAPI.buttonsCache);
         // console.log(gamepadAPI.buttonsStatus);
         // console.log(gamepadAPI.buttonPressed("select", 0));
@@ -408,17 +404,11 @@ let gamepadAPI = {
 		}
 		return newPress;
 	},
-	// buttons: [ // XBox360 layout
-	// 	'A','B','---','X',
-	// 	'Y','----','LB','RB',
-	// 	'LT','RT','select','start','-','LJ','RJ',
-	// ],
-    buttons: [ // PG-9076 linux layout
-    'A','B','X','Y',
-    'LB','RB','LT','RT',
-    'select','start','--','---',
-    'up','down','left','right',
-    ],
+	buttons: [ // XBox360 layout
+		'A','B','---','X',
+		'Y','----','LB','RB',
+		'LT','RT','select','start','-','LJ','RJ',
+	],
 	buttonsCache: [],
 	buttonsStatus: [],
 	axesStatus: [],
@@ -434,12 +424,11 @@ let gamepadAPI = {
             if (gamepadAPI.buttonPressed("start", 0)){
                 pid_act();
             }
-
             if (gamepadAPI.axesStatus[7] < 0){
-                pid_set(-1);
+                pid_set(-1)
             }
             if (gamepadAPI.axesStatus[7] > 0){
-                pid_set(1);
+                pid_set(1)
             }
             if (gamepadAPI.buttonPressed("LB", "hold")){
                 greb(-1)
@@ -591,23 +580,23 @@ pitch_subscriber.subscribe(function(msg) {
     document.getElementById('pitch').textContent="Дифферент: " + (msg.data.toFixed(2));
 });
 
-// function pid_act(){
-//     stat_pidr = !stat_pidr
-//     var pidr_request = new ROSLIB.ServiceRequest({
-//         data: stat_pidr ? true : false
-//     });
-//     pid_switch.callService(pidr_request, function(result) {
-//         // console.log(result)
-//     });
-//     // console.log('send pid request');
-//     if (control_type == 'web_joy'){
-//         document.getElementById('button-ch').checked ? document.getElementById('button-ch').checked = false : document.getElementById('button-ch').checked = true;
-//     }
-// }
+function pid_act(){
+    stat_pidr = !stat_pidr
+    var pidr_request = new ROSLIB.ServiceRequest({
+        data: stat_pidr ? true : false
+    });
+    pid_switch.callService(pidr_request, function(result) {
+        // console.log(result)
+    });
+    // console.log('send pid request');
+    if (control_type == 'web_joy'){
+        document.getElementById('button-ch').checked ? document.getElementById('button-ch').checked = false : document.getElementById('button-ch').checked = true;
+    }
+}
 
-// document.getElementById('button-1').onclick = function(){
-//     pid_act();
-// }
+document.getElementById('button-1').onclick = function(){
+    pid_act();
+}
 
  function pid_set(kk){
      depth = depth + (0.05 * kk);
@@ -620,17 +609,17 @@ pitch_subscriber.subscribe(function(msg) {
      pid_setpoint.publish(msg)
  }
 
-// function depth_change(){
+function depth_change(){
     
-//     const msg = new ROSLIB.Message({
-//         data: depth_real
-//     });
-//     depth = depth_real;
-//     document.getElementById('target_depth').textContent = depth_real;
-//     // console.log("<")
-//     pid_setpoint.publish(msg);
-//     console.log(depth_real);
-// }
+    const msg = new ROSLIB.Message({
+        data: depth_real
+    });
+    depth = depth_real;
+    document.getElementById('target_depth').textContent = depth_real;
+    // console.log("<")
+    pid_setpoint.publish(msg);
+    console.log(depth_real);
+}
 
  document.getElementById('pid_down').onclick = function(){
      pid_set(-1);
@@ -887,7 +876,7 @@ document.getElementById('settings_screen').onclick = function(){
 
 // ##############     Additional options     #################
 
-let stat_flash = [0, 250];
+let stat_flash = [0, 50, 100, 150];
 let stat_flash_id = 0 
 
 function light(){
