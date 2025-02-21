@@ -24,6 +24,18 @@
     <div id="rotate">Поверните устройство!</div>
 
     <div class="black_page_base" id="black_page"></div>
+
+    <div id="mapElement" style="display: none; position: absolute; z-index: 8; width: 100%; height: 100%;">
+      <div align="center" style="height: 100%;">
+        <iframe width="100%" height="100%" src="PWA and MAP/www/index.html"></iframe>
+      </div>
+    </div>
+
+    <div id="configELement" style="display: none; position: absolute; z-index: 8; width: 100%; height: 100%;">
+      <div align="center" style="height: 100%;">
+        <iframe width="100%" height="100%" src="PWA and WEB CONFIG/www/index.html"></iframe>
+      </div>
+    </div>
     
     <div class="container buttons">
       <div class="hamburger-menu">
@@ -37,6 +49,8 @@
     
         <ul class="menu__box" id="menu__box">
           <li><a class="menu__item"  id="main_screen" href="#">Управление</a></li>
+          <li><a class="menu__item"  id="map_screen" href="#">Карты</a></li>
+          <li><a class="menu__item"  id="config_screen" href="#">Найтрока конфигурации PID</a></li>
           <li><a class="menu__item"  id="mission_screen" href="#">Автономность</a></li>
           <li><a class="menu__item"  id="settings_screen" href="#">Настройки</a></li>
           <li><a class="menu__item"  id="photo_screen" href="#">Галерея</a></li>
@@ -84,9 +98,14 @@
       
       <div id="settings" class="settings_block">
         <div align="center">
+          <h2 align="center" class="blockname">IP адрес робота</h2>
+          <input id="ipRobot" />
+        </div>
+
+        <div align="center">
           <h2 align="center" class="blockname">Установить тип робота (ручной режим)</h2>
           <select id="selectCurRobotType">
-            <option value="trionix">тип ТРИОНИКС</option>
+            <option value="trionix" selected>тип ТРИОНИКС</option>
             <option value="guppy">тип ГУППИ</option>
             <option value="bag">тип Жук</option>
           </select>

@@ -1,4 +1,4 @@
-var  ws_url = 'ws://192.168.1.100:9090';
+//var  ws_url = 'ws://192.168.1.100:9090';
 // var  ws_url = 'ws://192.168.1.47:9090';
 // var  ws_url = 'ws://192.168.1.101:9090';
 // var  ws_url = 'ws://0.0.0.0:9090';
@@ -9,8 +9,22 @@ let video_status = 0
 
 
 var ros = new ROSLIB.Ros({
-    url : ws_url
+    url : `ws://${localStorage.getItem("ipRobot") || "192.168.1.100"}:9090`
 });
+
+const inputIpRobot = document.getElementById("ipRobot");
+inputIpRobot.value = localStorage.getItem("ipRobot");
+inputIpRobot.addEventListener("change", () => {
+    localStorage.setItem("ipRobot", inputIpRobot.value);
+    
+    ros = new ROSLIB.Ros({
+        url : `ws://${localStorage.getItem("ipRobot")}:9090`
+    });
+    
+    document.getElementById("videoImage").src = `http://${localStorage.getItem("ipRobot")}:8090/?action=stream`;
+});
+
+document.getElementById("videoImage").src = `http://${localStorage.getItem("ipRobot") || "192.168.1.100"}:8090/?action=stream`;
 
 ros.on('connection', function() {
 console.log('Connected to websocket server.');
@@ -37,15 +51,15 @@ console.log('Connection to websocket server closed.');
 //     console.log(params['/run_id'])
 // });
 
-// var teleop_status = new ROSLIB.Param({
-//     ros : ros,
-//     name : 'control_type'
-// });
+var teleop_status = new ROSLIB.Param({
+    ros : ros,
+    name : 'control_type'
+});
 
-// teleop_status.get(function(data) {
-//     console.log('control_type: ' + data);
-//     control_type = data;
-// });
+//teleop_status.get(function(data) {
+//    console.log('control_type: ' + data);
+//    control_type = data;
+//});
 
 // var mission_status = new ROSLIB.Param({
 //     ros : ros,
@@ -107,11 +121,11 @@ var manipulator_publisher = new ROSLIB.Topic({
     messageType: 'std_msgs/Float64'
 });
 
-// var pid_setpoint = new ROSLIB.Topic({
-//     ros: ros,
-//     name: '/pid/depth_pid/setpoint',
-//     messageType: 'std_msgs/Float64'
-// })
+ var pid_setpoint = new ROSLIB.Topic({
+     ros: ros,
+     name: '/pid/depth_pid/setpoint',
+     messageType: 'std_msgs/Float64'
+ })
 
 var get_thr_data_publisher = new ROSLIB.Topic({
     ros: ros,
@@ -210,11 +224,13 @@ function control() {
     if (control_type == 'web'){
         forward_backward = joy_right.GetY()
         left_right = joy_left.GetX()
+		up_down = joy_left.GetY()
 
         var cmd = new ROSLIB.Message({        
             // force: {
             linear: {
                 x: forward_backward > 0 ? forward_backward * G_MAX_FORWARD_BACKWARD[G_K_id] : forward_backward * G_MAX_FORWARD_BACKWARD[G_K_id],
+				z: up_down > 0 ? (up_down * G_MAX_UP_DOWN[G_K_id]) : (up_down * G_MAX_UP_DOWN[G_K_id] )
             },
             // torque: {
             angular: {
@@ -222,7 +238,7 @@ function control() {
             }
         });
         cmd_publisher.publish(cmd)
-    // console.log(cmd)
+    //console.log(cmd)
     }
     if (control_type == 'web_joy_1'){
         gameLoop()
@@ -244,13 +260,14 @@ function control() {
                 z: (left_right * G_MAX_ANGULAR[G_K_id])
             }
         });
+		console.log(cmd)
         cmd_publisher.publish(cmd)                
     }
     if (control_type == 'web_joy'){
         gameLoop2()
         gamepadAPI.update()
         gamepadAPI.control_gamepad_but();
-        // up_down = smooth_force( up_down, gamepadAPI.axesStatus[1])
+        up_down = smooth_force( up_down, gamepadAPI.axesStatus[1])
         left_right = smooth_force(left_right, gamepadAPI.axesStatus[0])
         forward_backward = smooth_force(forward_backward, gamepadAPI.axesStatus[3])
         // console.log(forward_backward)
@@ -592,16 +609,16 @@ pitch_subscriber.subscribe(function(msg) {
 //     pid_act();
 // }
 
-// function pid_set(kk){
-//     depth = depth + (0.05 * kk);
-//     depth = Math.min(10.0, Math.max(depth, 0.0));
-//     const msg = new ROSLIB.Message({
-//         data: depth
-//     })
-//     document.getElementById('target_depth').textContent = depth.toFixed(2);
-//     // console.log("<")
-//     pid_setpoint.publish(msg)
-// }
+ function pid_set(kk){
+     depth = depth + (0.05 * kk);
+     depth = Math.min(10.0, Math.max(depth, 0.0));
+     const msg = new ROSLIB.Message({
+         data: depth
+     })
+     document.getElementById('target_depth').textContent = depth.toFixed(2);
+     // console.log("<")
+     pid_setpoint.publish(msg)
+ }
 
 // function depth_change(){
     
@@ -615,14 +632,14 @@ pitch_subscriber.subscribe(function(msg) {
 //     console.log(depth_real);
 // }
 
-// document.getElementById('pid_down').onclick = function(){
-//     pid_set(-1);
-// }
+ document.getElementById('pid_down').onclick = function(){
+     pid_set(-1);
+ }
 
 
-// document.getElementById('pid_up').onclick = function(){
-//     pid_set(1);
-// }
+ document.getElementById('pid_up').onclick = function(){
+     pid_set(1);
+ }
 
 
 // ########## Thrusters Data ##########
@@ -723,7 +740,25 @@ document.getElementById('settings_upload').onclick = function(){
     get_thr_data_publisher.publish()
 }
 
+document.getElementById("map_screen").onclick = function(){
+    document.getElementById('mapElement').style.display = "block";
+    document.getElementById('configELement').style.display = "none";
+    document.getElementById('settings').style.display = 'none';
+    document.getElementById('black_page').style.display = 'block';
+    document.getElementById('menu__toggle').checked = false;
+}
+
+document.getElementById("config_screen").onclick = function(){
+    document.getElementById('mapElement').style.display = "none";
+    document.getElementById('configELement').style.display = "block";
+    document.getElementById('settings').style.display = 'none';
+    document.getElementById('black_page').style.display = 'block';
+    document.getElementById('menu__toggle').checked = false;
+}
+
 document.getElementById('main_screen').onclick = function(){
+    document.getElementById("mapElement").style.display = "none";
+    document.getElementById('configELement').style.display = "none";
     document.getElementById('settings').style.display == 'block' ? document.getElementById('settings').style.display = 'none' : document.getElementById('settings').style.display = 'none';
     // document.getElementById('missions').style.display == 'block' ? document.getElementById('missions').style.display = 'none' : document.getElementById('missions').style.display = 'none';
     document.getElementById('black_page').style.display == 'block' ? document.getElementById('black_page').style.display = 'none' : document.getElementById('black_page').style.display = 'none';
@@ -732,6 +767,8 @@ document.getElementById('main_screen').onclick = function(){
 }
 
 document.getElementById('settings_screen').onclick = function(){
+    document.getElementById("mapElement").style.display = "none";
+    document.getElementById('configELement').style.display = "none";
     // document.getElementById('missions').style.display == 'block' ? document.getElementById('missions').style.display = 'none' : document.getElementById('missions').style.display = 'none';
     document.getElementById('settings').style.display == 'block' ? document.getElementById('settings').style.display = 'block' : document.getElementById('settings').style.display = 'block';
     // document.getElementById('photo_galary').style.display == 'none' ? document.getElementById('photo_galary').style.display = 'none' : document.getElementById('photo_galary').style.display = 'none';
@@ -881,7 +918,7 @@ function greb(v){
         data: Math.floor(manipulator)
     });
     manipulator_publisher.publish(cmd);
-    console.log(cmd);
+    //console.log(cmd);
 }
 
 var counter

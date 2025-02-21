@@ -1,0 +1,12 @@
+body {
+    font-family: "Times New Roman", Times, serif;
+    margin: 20px;
+}
+
+#map { height: 80vh; }
+
+#markerTypeSelector {
+    position: absolute;
+    left: 100%;
+    top: 0;
+}

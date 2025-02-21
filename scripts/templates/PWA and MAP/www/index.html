@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="style/index.css">
+    <link rel="stylesheet" href="leaflet_components/leaflet.css">
+    <link rel="stylesheet" href="leaflet_components/leaflet.draw.css">
+
+    <script src="leaflet_components/leaflet.js" defer></script>
+    <script src="leaflet_components/leaflet.draw.js" defer></script>
+    <script src="leaflet_components/leaflet-arrowheads.js" defer></script>
+    <script src="leaflet_components/leaflet.geometryutil.js" defer></script>
+    <script src="scripts/leaflet_map.js" defer></script>
+</head>
+
+<body>
+    <h1 align="center">Оффлайн/онлайн карты</h1>
+    <div id="controls">
+        <select id="mapProvider">
+            <option value="osm">OpenStreetMap</option>
+            <option value="google">Google Maps</option>
+            <option value="yandex">Yandex Maps</option>
+        </select>
+
+        <button id="deleteAllDBButton">Удалить все закешированные карты</button>
+
+        <input id="latInput" type="number" placeholder="Широта" step="any" />
+        <input id="lngInput" type="number" placeholder="Долгота" step="any" />
+        <button id="setCoords">Переместиться на координаты</button>
+
+        <div id="curCoords"></div>
+
+        <button id="loadGeoJSON">Загрузить маршрут из файла</button>
+        <button id="uploadGeoJSON">Скачать маршрут как файл</button>
+
+        <select id="markerTypeSelector" style="display: none;">
+            <option value="regular" selected>Обычный маркер</option>
+            <option value="home">Домашняя позиция</option>
+        </select>
+    </div>
+
+    <div id="map"></div>
+</body>
+
+</html>
