@@ -1,4 +1,8 @@
 const { app, BrowserWindow, session } = require("electron/main");
+const path = require("path");
+
+// Устанавливаем путь для хранения данных приложения
+app.setPath("appData", path.join(__dirname, "dataElectron"));
 
 const createWindow = () => {
     const win = new BrowserWindow({
@@ -20,7 +24,7 @@ const createWindow = () => {
         delete details.requestHeaders["sec-fetch-site"];
 
         // Разрешаем все вхоядщие данные
-        details.requestHeaders["Accept"] = "*/*";
+        details.requestHeaders["Accept"] = "image/webp,*/*";
 
         callback({ requestHeaders: details.requestHeaders });
     });

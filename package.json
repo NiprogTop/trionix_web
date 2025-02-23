@@ -1,19 +1,19 @@
 {
-  "name": "trionix_web",
-  "author": "LAVRIK596",
-  "license": "ISC",
-  "version": "1.0.0",
-  "description": "Application for control robots by Trionix LAB",
-  "scripts": {
-    "start": "electron ./application_source/",
-    "pack-win": "electron-packager ./application_source/ \"TRIONIX LAB Control Center\" --platform=win32 --arch=x64 --out=release-builds --overwrite --icon=\"./icon/windows.ico\"",
-    "pack-linux": "electron-packager ./application_source/ \"TRIONIX LAB Control Center\" --platform=linux --out=release-builds --overwrite --icon=\"./icon/linux.png\""
-  },
-  "dependencies": {
-    "electron-packager": "^17.1.2",
-    "node.js": "0.0.1-security"
-  },
-  "devDependencies": {
-    "electron": "^34.2.0"
-  }
+    "name": "trionix_web",
+    "author": "LAVRIK596",
+    "license": "ISC",
+    "version": "1.0.0",
+    "description": "Application for control robots by Trionix LAB",
+    "scripts": {
+        "start-linux-debug-auto-clear": "electron ./application_source/ && rm -rf ./application_source/dataElectron/",
+        "pack-win": "electron-packager ./application_source/ \"TRIONIX LAB Control Center\" --platform=win32 --arch=x64 --out=release-builds --overwrite --icon=\"./icon/windows.ico\"",
+        "pack-linux": "electron-packager ./application_source/ \"TRIONIX LAB Control Center\" --platform=linux --out=release-builds --overwrite --icon=\"./icon/linux.png\""
+    },
+    "dependencies": {
+        "electron-packager": "^17.1.2",
+        "node.js": "0.0.1-security"
+    },
+    "devDependencies": {
+        "electron": "^34.2.0"
+    }
 }
