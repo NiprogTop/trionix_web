@@ -6,7 +6,7 @@ function downloadFile(url, fileName) {
     xhr.open("GET", url, true);
     xhr.follow_redirects = false;
     xhr.responseType = "blob";
-    xhr.onload = function(){
+    xhr.onload = function () {
         var blob = this.response;
         var link = document.createElement('a');
         link.href = window.URL.createObjectURL(blob);
@@ -22,8 +22,7 @@ function downloadFile(url, fileName) {
 function deleteFile(fileName, container) {
     fetch(`http://` + IP + `:8080/delete/${fileName}`, {
         method: 'DELETE'
-    })
-    .then(response => {
+    }).then(response => {
         if (response.ok) {
             console.log('File deleted successfully');
             container.remove();
@@ -31,7 +30,7 @@ function deleteFile(fileName, container) {
             console.error('Error deleting file:', response.statusText);
         }
     })
-    .catch(error => console.error('Error deleting file:', error));
+        .catch(error => console.error('Error deleting file:', error));
 }
 
 
@@ -61,66 +60,66 @@ function showNext() {
 
 function load_p() {
     fetch('http://' + IP + ':8080/files')
-    .then(response => response.text())
-    .then(text => {
-        const files = text.split('\n').filter(file => file.trim() !== '');
-        const photosDiv = document.getElementById('photos');
-        photosDiv.innerHTML = '';
-        modalImages = [];
+        .then(response => response.text())
+        .then(text => {
+            const files = text.split('\n').filter(file => file.trim() !== '');
+            const photosDiv = document.getElementById('photos');
+            photosDiv.innerHTML = '';
+            modalImages = [];
 
-        files.forEach(file => {
-            if (file.toLowerCase().endsWith('.jpg')) {
-                const img = document.createElement('img');
-                img.src = 'http://' + IP + ':8080/' + file;
-                img.classList.add('image-preview');
+            files.forEach(file => {
+                if (file.toLowerCase().endsWith('.jpg')) {
+                    const img = document.createElement('img');
+                    img.src = 'http://' + IP + ':8080/' + file;
+                    img.classList.add('image-preview');
 
-                img.addEventListener('click', function(event) {
-                    openModal(modalImages.indexOf(img.src));
-                });
+                    img.addEventListener('click', function (event) {
+                        openModal(modalImages.indexOf(img.src));
+                    });
 
-                const link = document.createElement('a');
-                link.href = 'http://' + IP + ':8080/' + file;
-                link.textContent = 'Download';
-                link.classList.add('download-button');
-                link.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    downloadFile(this.href, file);
-                });
+                    const link = document.createElement('a');
+                    link.href = 'http://' + IP + ':8080/' + file;
+                    link.textContent = 'Download';
+                    link.classList.add('download-button');
+                    link.addEventListener('click', function (event) {
+                        event.preventDefault();
+                        downloadFile(this.href, file);
+                    });
 
-                const dell = document.createElement('button');
-                dell.textContent = 'Delete';
-                dell.classList.add('delete-button');
-                dell.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    const container = this.parentNode.parentNode;
-                    const imgElement = container.querySelector('img');
-                    const fileName = imgElement ? imgElement.src.split('/').pop() : '';
-                    if (fileName) {
-                        deleteFile(fileName, container);
-                    }
-                });
+                    const dell = document.createElement('button');
+                    dell.textContent = 'Delete';
+                    dell.classList.add('delete-button');
+                    dell.addEventListener('click', function (event) {
+                        event.preventDefault();
+                        const container = this.parentNode.parentNode;
+                        const imgElement = container.querySelector('img');
+                        const fileName = imgElement ? imgElement.src.split('/').pop() : '';
+                        if (fileName) {
+                            deleteFile(fileName, container);
+                        }
+                    });
 
-                const caption = document.createElement('div');
-                caption.textContent = file;
-                caption.classList.add('image-name');
-                
-                const buttonContainer = document.createElement('div');
-                buttonContainer.classList.add('button-container');
-                buttonContainer.appendChild(link);
-                buttonContainer.appendChild(dell);
+                    const caption = document.createElement('div');
+                    caption.textContent = file;
+                    caption.classList.add('image-name');
 
-                const container = document.createElement('div');
-                container.classList.add('photo-container');
-                container.appendChild(img);
-                container.appendChild(caption);
-                container.appendChild(buttonContainer);
+                    const buttonContainer = document.createElement('div');
+                    buttonContainer.classList.add('button-container');
+                    buttonContainer.appendChild(link);
+                    buttonContainer.appendChild(dell);
 
-                photosDiv.appendChild(container);
-                modalImages.push(img.src);
-            }
-        });
-    })
-    .catch(error => console.error('Error fetching files:', error));
+                    const container = document.createElement('div');
+                    container.classList.add('photo-container');
+                    container.appendChild(img);
+                    container.appendChild(caption);
+                    container.appendChild(buttonContainer);
+
+                    photosDiv.appendChild(container);
+                    modalImages.push(img.src);
+                }
+            });
+        })
+        .catch(error => console.error('Error fetching files:', error));
 }
 
 // document.querySelector('.close').addEventListener('click', closeModal);

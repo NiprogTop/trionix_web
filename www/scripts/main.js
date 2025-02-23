@@ -1,8 +1,3 @@
-//var  ws_url = 'ws://192.168.1.100:9090';
-// var  ws_url = 'ws://192.168.1.47:9090';
-// var  ws_url = 'ws://192.168.1.101:9090';
-// var  ws_url = 'ws://0.0.0.0:9090';
-
 let control_type = "web"
 let mission_stat_vel = 0
 let video_status = 0
