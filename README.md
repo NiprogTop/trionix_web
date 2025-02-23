@@ -13,7 +13,7 @@ npm run <тут команда>
 # Как собрать приложение в первый раз
 1. Находясь в директории инициализировать его:
 ```schell
-npm init
+npm install package.json
 ```
 2. Обносить Electron:
 ```schell
