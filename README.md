@@ -11,6 +11,11 @@ npm run <тут команда>
 Автодополнение команды с помощью `Tab` **работает**.
 
 # Как собрать приложение в первый раз
+## Одна команда
+```schell
+npm install package.json && sudo npm install -g n && sudo n lts && sudo n latest && npm install electron-packager && sudo apt install wine64 wine32 wine
+```
+## Разбор команды
 1. Находясь в директории инициализировать его:
 ```schell
 npm install package.json
