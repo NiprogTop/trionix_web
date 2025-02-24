@@ -1,0 +1,88 @@
+#hamburger_toggle {
+    opacity: 0;
+}
+
+#hamburger_toggle:checked+.hamburger_button>span {
+    transform: rotate(45deg);
+}
+
+#hamburger_toggle:checked+.hamburger_button>span::before {
+    top: 0;
+    transform: rotate(0deg);
+}
+
+#hamburger_toggle:checked+.hamburger_button>span::after {
+    top: 0;
+    transform: rotate(90deg);
+}
+
+#hamburger_toggle:checked~.hamburger_box {
+    left: 0 !important;
+}
+
+#hamburger_toggle:checked~.black_page {
+    display: block !important;
+}
+
+.hamburger_button {
+    position: fixed;
+    top: 10px;
+    left: 20px;
+    width: 26px;
+    height: 26px;
+    cursor: pointer;
+    z-index: 11;
+}
+
+.hamburger_button>span,
+.hamburger_button>span::before,
+.hamburger_button>span::after {
+    display: block;
+    position: absolute;
+    top: 10px;
+    width: 100%;
+    height: 2px;
+    background-color: #616161;
+    transition-duration: .25s;
+}
+
+.hamburger_button>span::before {
+    content: "";
+    top: -8px;
+}
+
+.hamburger_button>span::after {
+    content: "";
+    top: 8px;
+}
+
+.hamburger_box {
+    display: block;
+    position: fixed;
+    top: -5%;
+    left: -100%;
+    width: 300px;
+    height: 100%;
+    margin: 0;
+    padding: 80px 0;
+    list-style: none;
+    background-color: #ECEFF1;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, .4);
+    transition-duration: .25s;
+    z-index: 10;
+}
+
+.hamburger_item {
+    display: block;
+    padding: 12px 24px;
+    color: #333;
+    font-family: "Roboto", sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    text-decoration: none;
+    transition-duration: .25s;
+}
+
+.hamburger_item:hover {
+    background-color: #CFD8DC;
+}
