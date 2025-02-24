@@ -1,0 +1,42 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "description": "Список со всеми настройками приложения.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "robotINFO"
+    ],
+    "properties": {
+        "robotINFO": {
+            "description": "Информация об роботе.",
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "name",
+                "address",
+                "type"
+            ],
+            "properties": {
+                "name": {
+                    "description": "Человеко-читаемое имя робота",
+                    "type": "string",
+                    "default": "<ROBOT NAME>"
+                },
+                "address": {
+                    "description": "Адрес робота, по которому можно установить соединение.",
+                    "type": "string",
+                    "default": "192.168.1.100"
+                },
+                "type": {
+                    "description": "ТИП робота.",
+                    "type": "string",
+                    "enum": [
+                        "trionix",
+                        "guppy",
+                        "bag"
+                    ]
+                }
+            }
+        }
+    }
+}

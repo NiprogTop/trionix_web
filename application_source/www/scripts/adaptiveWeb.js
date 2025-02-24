@@ -20,6 +20,7 @@ const screenButtonPairs = {
     "control_screen": ["control_select"],
     "map_screen": ["map_select"],
     "config_screen": ["config_select"],
+    "settings_screen": ["settings_select"],
 };
 
 function reDisplayELements(dictElement, targetElement) {
