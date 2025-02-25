@@ -145,11 +145,11 @@ let thr_config_name
 let thr_config_position
 let mission = []
 
-let G_MAX_FORWARD_BACKWARD = [-0.35, -0.65, -1.0] // -1 
+let G_MAX_FORWARD_BACKWARD = [-0.0035, -0.065, -0.1] // -1 
 // const G_MAX_BACKWARD = 1
-let G_MAX_UP_DOWN = [-0.4, -0.6, -1.0] // -1 
+let G_MAX_UP_DOWN = [-0.0085, -0.06, -0.1] // -1 
 // const G_MAX_UP = 1
-let G_MAX_ANGULAR = [0.07, 0.08, 0.05] // 0.15 
+let G_MAX_ANGULAR = [0.001, 0.003, 0.005] // 0.15 
 let G_MAX_PITCH_ANGULAR = [0.1, 0.1, 0.1] //0.2
 
 let G_K_id = 0 
@@ -199,50 +199,35 @@ setInterval(function () { control(); }, 100);
 function control() {
     if (control_type == 'web'){
         forward_backward = joy_right.GetY()
-        left_right = joy_left.GetX()
+        left_right = joy_right.GetX()
+        up_down = joy_left.GetY()
+        // console.log(left_right)
 
         var cmd = new ROSLIB.Message({        
             // force: {
             linear: {
                 x: forward_backward > 0 ? forward_backward * G_MAX_FORWARD_BACKWARD[G_K_id] : forward_backward * G_MAX_FORWARD_BACKWARD[G_K_id],
-            },
-            // torque: {
-            angular: {
-                z: (left_right * MAX_ANGULAR)
-            }
-        });
-        cmd_publisher.publish(cmd)
-    // console.log(cmd)
-    }
-    if (control_type == 'web_joy_1'){
-        gameLoop()
-
-        up_down = smooth_force( up_down, axList[1])
-        left_right = smooth_force(left_right, axList[0])
-        forward_backward = smooth_force(forward_backward, axList[3])
-        // console.log(forward_backward)
-        pitch_moment_down = butList[6]
-        pitch_moment_up = butList[7]
-
-        var cmd = new ROSLIB.Message({        
-            // force: {
-            linear: {
-                x: forward_backward > 0 ? forward_backward * G_MAX_FORWARD_BACKWARD[G_K_id] : forward_backward * G_MAX_FORWARD_BACKWARD[G_K_id]
+                z: up_down > 0 ? (up_down * G_MAX_UP_DOWN[G_K_id]) : (up_down * G_MAX_UP_DOWN[G_K_id] )
             },
             // torque: {
             angular: {
                 z: (left_right * G_MAX_ANGULAR[G_K_id])
             }
         });
-        cmd_publisher.publish(cmd)                
+        cmd_publisher.publish(cmd)
+        // console.log(cmd)
     }
     if (control_type == 'web_joy'){
         gameLoop2()
         gamepadAPI.update()
         gamepadAPI.control_gamepad_but();
+        up_down = gamepadAPI.axesStatus[1] * 100
+        left_right = gamepadAPI.axesStatus[2]  * 100
+        forward_backward = gamepadAPI.axesStatus[3] * 100
         // up_down = smooth_force( up_down, gamepadAPI.axesStatus[1])
-        left_right = smooth_force(left_right, gamepadAPI.axesStatus[0])
-        forward_backward = smooth_force(forward_backward, gamepadAPI.axesStatus[3])
+        // left_right = smooth_force(left_right, gamepadAPI.axesStatus[0]) 
+        // forward_backward = smooth_force(forward_backward, gamepadAPI.axesStatus[3])
+        // console.log(left_right)
         // console.log(forward_backward)
         pitch_moment_down = butList[6]
         pitch_moment_up = butList[7]
@@ -255,10 +240,11 @@ function control() {
             },
             // torque: {
             angular: {
-                y: pitch_moment_down * G_MAX_PITCH_ANGULAR[G_K_id] + pitch_moment_up * G_MAX_PITCH_ANGULAR[G_K_id] * -1,
+                // y: pitch_moment_down * G_MAX_PITCH_ANGULAR[G_K_id] + pitch_moment_up * G_MAX_PITCH_ANGULAR[G_K_id] * -1,
                 z: (left_right * G_MAX_ANGULAR[G_K_id] )
             }
         });
+        console.log(left_right * G_MAX_ANGULAR[G_K_id])
         cmd_publisher.publish(cmd)                
     }
 }
@@ -382,7 +368,7 @@ let gamepadAPI = {
 	buttons: [ // XBox360 layout
 		'A','B','---','X',
 		'Y','----','LB','RB',
-		'LT','RT','select','start','-','LJ','RJ',
+		'LT','RT','select','start','down','up','RJ',
 	],
 	buttonsCache: [],
 	buttonsStatus: [],
@@ -399,11 +385,11 @@ let gamepadAPI = {
             if (gamepadAPI.buttonPressed("start", 0)){
                 pid_act();
             }
-            if (gamepadAPI.axesStatus[7] < 0){
-                pid_set(-1)
+            if (gamepadAPI.buttonPressed("down", 0)){
+                pid_set(-1);
             }
-            if (gamepadAPI.axesStatus[7] > 0){
-                pid_set(1)
+            if (gamepadAPI.buttonPressed("up", 0)){
+                pid_set(1);
             }
             if (gamepadAPI.buttonPressed("LB", "hold")){
                 greb(-1)
@@ -852,9 +838,10 @@ document.getElementById('flashlight').onclick = function(){
     light();    
 }
 
-let manipulator = 0
+
 
 function greb(v){
+    let manipulator = 0
     manipulator = v;
     // document.getElementById('trionixGrab').value = manipulator;
 
@@ -877,7 +864,7 @@ document.getElementById('grab_1').onmousedown = function(){
 }
 document.getElementById('grab_1').onmouseup = function(){
     clearInterval(counter)
-    greb(0)
+    greb(0);
 }
 document.getElementById('grab_2').onmouseup= function(){
     clearInterval(counter)
@@ -885,12 +872,12 @@ document.getElementById('grab_2').onmouseup= function(){
 }
 
 document.getElementById('grab_2').onmousedown = function(){
-    greb(1);
-    counter = setInterval(function() {
-        // wrapper.innerHTML = count;
-        // count++;
-        greb(1);
-    }, 100);
+  greb(1);
+   counter = setInterval(function() {
+       // wrapper.innerHTML = count;
+       // count++;
+       greb(1);
+   }, 100);
 }
 
 
