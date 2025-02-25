@@ -1,4 +1,4 @@
-//var  ws_url = 'ws://192.168.1.100:9090';
+var  ws_url = 'ws://192.168.1.100:9090';
 // var  ws_url = 'ws://192.168.1.47:9090';
 // var  ws_url = 'ws://192.168.1.101:9090';
 // var  ws_url = 'ws://0.0.0.0:9090';
@@ -9,22 +9,8 @@ let video_status = 0
 
 
 var ros = new ROSLIB.Ros({
-    url : `ws://${localStorage.getItem("ipRobot") || "192.168.1.100"}:9090`
+    url : ws_url
 });
-
-const inputIpRobot = document.getElementById("ipRobot");
-inputIpRobot.value = localStorage.getItem("ipRobot");
-inputIpRobot.addEventListener("change", () => {
-    localStorage.setItem("ipRobot", inputIpRobot.value);
-    
-    ros = new ROSLIB.Ros({
-        url : `ws://${localStorage.getItem("ipRobot")}:9090`
-    });
-    
-    document.getElementById("videoImage").src = `http://${localStorage.getItem("ipRobot")}:8090/?action=stream`;
-});
-
-document.getElementById("videoImage").src = `http://${localStorage.getItem("ipRobot") || "192.168.1.100"}:8090/?action=stream`;
 
 ros.on('connection', function() {
 console.log('Connected to websocket server.');
@@ -56,10 +42,10 @@ var teleop_status = new ROSLIB.Param({
     name : 'control_type'
 });
 
-//teleop_status.get(function(data) {
-//    console.log('control_type: ' + data);
-//    control_type = data;
-//});
+// teleop_status.get(function(data) {
+//     console.log('control_type: ' + data);
+//     control_type = data;
+// });
 
 var mission_status = new ROSLIB.Param({
     ros : ros,
@@ -121,11 +107,11 @@ var manipulator_publisher = new ROSLIB.Topic({
     messageType: 'std_msgs/Float64'
 });
 
- var pid_setpoint = new ROSLIB.Topic({
-     ros: ros,
-     name: '/pid/depth_pid/setpoint',
-     messageType: 'std_msgs/Float64'
- })
+var pid_setpoint = new ROSLIB.Topic({
+    ros: ros,
+    name: '/pid/depth_pid/setpoint',
+    messageType: 'std_msgs/Float64'
+})
 
 var get_thr_data_publisher = new ROSLIB.Topic({
     ros: ros,
@@ -139,20 +125,11 @@ var thr_save_publisher = new ROSLIB.Topic({
     messageType: 'std_msgs/String'
 });
 
-var light_signal_publisher = new ROSLIB.Topic({
-    ros: ros,
-    name: '/light_signal',
-    messageType: 'std_msgs/Int16'
-});
-
 var pid_switch = new ROSLIB.Service({
     ros: ros,
     name: '/pid/switch',
     serviceType: 'std_srvs/SetBool'
 });
-
-
-
 
 // ##########    Joy Contol    #########
 
@@ -168,11 +145,11 @@ let thr_config_name
 let thr_config_position
 let mission = []
 
-let G_MAX_FORWARD_BACKWARD = [-0.35, -0.65, -1.0] // -1 
+let G_MAX_FORWARD_BACKWARD = [-0.0035, -0.065, -0.1] // -1 
 // const G_MAX_BACKWARD = 1
-let G_MAX_UP_DOWN = [-0.4, -0.6, -1.0] // -1 
+let G_MAX_UP_DOWN = [-0.0085, -0.06, -0.1] // -1 
 // const G_MAX_UP = 1
-let G_MAX_ANGULAR = [0.07, 0.08, 0.05] // 0.15 
+let G_MAX_ANGULAR = [0.001, 0.003, 0.005] // 0.15 
 let G_MAX_PITCH_ANGULAR = [0.1, 0.1, 0.1] //0.2
 
 let G_K_id = 0 
@@ -221,53 +198,36 @@ setInterval(function () { control(); }, 100);
 
 function control() {
     if (control_type == 'web'){
-        up_down = joy_left.GetY()
-        left_right = joy_right.GetX()
         forward_backward = joy_right.GetY()
+        left_right = joy_right.GetX()
+        up_down = joy_left.GetY()
+        // console.log(left_right)
 
         var cmd = new ROSLIB.Message({        
             // force: {
             linear: {
-                x: forward_backward > 0 ? forward_backward * 0.01 * G_MAX_FORWARD_BACKWARD[G_K_id] : forward_backward * 0.01 *  G_MAX_FORWARD_BACKWARD[G_K_id],
-                z: up_down > 0 ? (up_down * MAX_UP) : (up_down * MAX_DOWN)
-            },
-            // torque: {
-            angular: {
-                z: (left_right * MAX_ANGULAR)
-            }
-        });
-        cmd_publisher.publish(cmd)
-    // console.log(cmd)
-    }
-    if (control_type == 'web_joy_1'){
-        gameLoop()
-
-        up_down = smooth_force( up_down, axList[1])
-        left_right = smooth_force(left_right, axList[0])
-        forward_backward = smooth_force(forward_backward, axList[3])
-        // console.log(forward_backward)
-        pitch_moment_down = butList[6]
-        pitch_moment_up = butList[7]
-
-        var cmd = new ROSLIB.Message({        
-            // force: {
-            linear: {
-                x: forward_backward > 0 ? forward_backward * G_MAX_FORWARD_BACKWARD[G_K_id] : forward_backward * G_MAX_FORWARD_BACKWARD[G_K_id]
+                x: forward_backward > 0 ? forward_backward * G_MAX_FORWARD_BACKWARD[G_K_id] : forward_backward * G_MAX_FORWARD_BACKWARD[G_K_id],
+                z: up_down > 0 ? (up_down * G_MAX_UP_DOWN[G_K_id]) : (up_down * G_MAX_UP_DOWN[G_K_id] )
             },
             // torque: {
             angular: {
                 z: (left_right * G_MAX_ANGULAR[G_K_id])
             }
         });
-        cmd_publisher.publish(cmd)                
+        cmd_publisher.publish(cmd)
+        // console.log(cmd)
     }
     if (control_type == 'web_joy'){
         gameLoop2()
         gamepadAPI.update()
         gamepadAPI.control_gamepad_but();
-        up_down = smooth_force( up_down, gamepadAPI.axesStatus[1])
-        left_right = smooth_force(left_right, gamepadAPI.axesStatus[2])
-        forward_backward = smooth_force(forward_backward, gamepadAPI.axesStatus[3])
+        up_down = gamepadAPI.axesStatus[1] * 100
+        left_right = gamepadAPI.axesStatus[2]  * 100
+        forward_backward = gamepadAPI.axesStatus[3] * 100
+        // up_down = smooth_force( up_down, gamepadAPI.axesStatus[1])
+        // left_right = smooth_force(left_right, gamepadAPI.axesStatus[0]) 
+        // forward_backward = smooth_force(forward_backward, gamepadAPI.axesStatus[3])
+        // console.log(left_right)
         // console.log(forward_backward)
         pitch_moment_down = butList[6]
         pitch_moment_up = butList[7]
@@ -280,10 +240,11 @@ function control() {
             },
             // torque: {
             angular: {
-                y: pitch_moment_down * G_MAX_PITCH_ANGULAR[G_K_id] + pitch_moment_up * G_MAX_PITCH_ANGULAR[G_K_id] * -1,
+                // y: pitch_moment_down * G_MAX_PITCH_ANGULAR[G_K_id] + pitch_moment_up * G_MAX_PITCH_ANGULAR[G_K_id] * -1,
                 z: (left_right * G_MAX_ANGULAR[G_K_id] )
             }
         });
+        console.log(left_right * G_MAX_ANGULAR[G_K_id])
         cmd_publisher.publish(cmd)                
     }
 }
@@ -407,7 +368,7 @@ let gamepadAPI = {
 	buttons: [ // XBox360 layout
 		'A','B','---','X',
 		'Y','----','LB','RB',
-		'LT','RT','select','start','-','LJ','RJ',
+		'LT','RT','select','start','down','up','RJ',
 	],
 	buttonsCache: [],
 	buttonsStatus: [],
@@ -424,11 +385,11 @@ let gamepadAPI = {
             if (gamepadAPI.buttonPressed("start", 0)){
                 pid_act();
             }
-            if (gamepadAPI.axesStatus[7] < 0){
-                pid_set(-1)
+            if (gamepadAPI.buttonPressed("down", 0)){
+                pid_set(-1);
             }
-            if (gamepadAPI.axesStatus[7] > 0){
-                pid_set(1)
+            if (gamepadAPI.buttonPressed("up", 0)){
+                pid_set(1);
             }
             if (gamepadAPI.buttonPressed("LB", "hold")){
                 greb(-1)
@@ -598,16 +559,16 @@ document.getElementById('button-1').onclick = function(){
     pid_act();
 }
 
- function pid_set(kk){
-     depth = depth + (0.05 * kk);
-     depth = Math.min(10.0, Math.max(depth, 0.0));
-     const msg = new ROSLIB.Message({
-         data: depth
-     })
-     document.getElementById('target_depth').textContent = depth.toFixed(2);
-     // console.log("<")
-     pid_setpoint.publish(msg)
- }
+function pid_set(kk){
+    depth = depth + (0.05 * kk);
+    depth = Math.min(10.0, Math.max(depth, 0.0));
+    const msg = new ROSLIB.Message({
+        data: depth
+    })
+    document.getElementById('target_depth').textContent = depth.toFixed(2);
+    // console.log("<")
+    pid_setpoint.publish(msg)
+}
 
 function depth_change(){
     
@@ -621,14 +582,14 @@ function depth_change(){
     console.log(depth_real);
 }
 
- document.getElementById('pid_down').onclick = function(){
-     pid_set(-1);
- }
+document.getElementById('pid_down').onclick = function(){
+    pid_set(-1);
+}
 
 
- document.getElementById('pid_up').onclick = function(){
-     pid_set(1);
- }
+document.getElementById('pid_up').onclick = function(){
+    pid_set(1);
+}
 
 
 // ########## Thrusters Data ##########
@@ -729,38 +690,18 @@ document.getElementById('settings_upload').onclick = function(){
     get_thr_data_publisher.publish()
 }
 
-document.getElementById("map_screen").onclick = function(){
-    document.getElementById('mapElement').style.display = "block";
-    document.getElementById('configELement').style.display = "none";
-    document.getElementById('settings').style.display = 'none';
-    document.getElementById('black_page').style.display = 'block';
-    document.getElementById('menu__toggle').checked = false;
-}
-
-document.getElementById("config_screen").onclick = function(){
-    document.getElementById('mapElement').style.display = "none";
-    document.getElementById('configELement').style.display = "block";
-    document.getElementById('settings').style.display = 'none';
-    document.getElementById('black_page').style.display = 'block';
-    document.getElementById('menu__toggle').checked = false;
-}
-
 document.getElementById('main_screen').onclick = function(){
-    document.getElementById("mapElement").style.display = "none";
-    document.getElementById('configELement').style.display = "none";
     document.getElementById('settings').style.display == 'block' ? document.getElementById('settings').style.display = 'none' : document.getElementById('settings').style.display = 'none';
     // document.getElementById('missions').style.display == 'block' ? document.getElementById('missions').style.display = 'none' : document.getElementById('missions').style.display = 'none';
     document.getElementById('black_page').style.display == 'block' ? document.getElementById('black_page').style.display = 'none' : document.getElementById('black_page').style.display = 'none';
-    // document.getElementById('photo_galary').style.display == 'block' ? document.getElementById('photo_galary').style.display = 'none' : document.getElementById('photo_galary').style.display = 'none';
+    document.getElementById('photo_galary').style.display == 'block' ? document.getElementById('photo_galary').style.display = 'none' : document.getElementById('photo_galary').style.display = 'none';
     document.getElementById('menu__toggle').checked = false;
 }
 
 document.getElementById('settings_screen').onclick = function(){
-    document.getElementById("mapElement").style.display = "none";
-    document.getElementById('configELement').style.display = "none";
     // document.getElementById('missions').style.display == 'block' ? document.getElementById('missions').style.display = 'none' : document.getElementById('missions').style.display = 'none';
     document.getElementById('settings').style.display == 'block' ? document.getElementById('settings').style.display = 'block' : document.getElementById('settings').style.display = 'block';
-    // document.getElementById('photo_galary').style.display == 'none' ? document.getElementById('photo_galary').style.display = 'none' : document.getElementById('photo_galary').style.display = 'none';
+    document.getElementById('photo_galary').style.display == 'none' ? document.getElementById('photo_galary').style.display = 'none' : document.getElementById('photo_galary').style.display = 'none';
     document.getElementById('black_page').style.display == 'block' ? document.getElementById('black_page').style.display = 'block' : document.getElementById('black_page').style.display = 'block';
     document.getElementById('menu__toggle').checked = false;
     // const save_data = new ROSLIB.Message({
@@ -769,17 +710,17 @@ document.getElementById('settings_screen').onclick = function(){
     get_thr_data_publisher.publish()
 }
 
-// document.getElementById('photo_screen').onclick = function(){
-//     // document.getElementById('missions').style.display == 'block' ? document.getElementById('missions').style.display = 'none' : document.getElementById('missions').style.display = 'none';
-//     document.getElementById('settings').style.display == 'none' ? document.getElementById('settings').style.display = 'none' : document.getElementById('settings').style.display = 'none';
-//     document.getElementById('photo_galary').style.display == 'block' ? document.getElementById('photo_galary').style.display = 'block' : document.getElementById('photo_galary').style.display = 'block';
-//     document.getElementById('black_page').style.display == 'block' ? document.getElementById('black_page').style.display = 'block' : document.getElementById('black_page').style.display = 'block';
-//     document.getElementById('menu__toggle').checked = false;
-//     // const save_data = new ROSLIB.Message({
-//     //     data: 1
-//     // })
-//     // get_thr_data_publisher.publish()
-// }
+document.getElementById('photo_screen').onclick = function(){
+    // document.getElementById('missions').style.display == 'block' ? document.getElementById('missions').style.display = 'none' : document.getElementById('missions').style.display = 'none';
+    document.getElementById('settings').style.display == 'none' ? document.getElementById('settings').style.display = 'none' : document.getElementById('settings').style.display = 'none';
+    document.getElementById('photo_galary').style.display == 'block' ? document.getElementById('photo_galary').style.display = 'block' : document.getElementById('photo_galary').style.display = 'block';
+    document.getElementById('black_page').style.display == 'block' ? document.getElementById('black_page').style.display = 'block' : document.getElementById('black_page').style.display = 'block';
+    document.getElementById('menu__toggle').checked = false;
+    // const save_data = new ROSLIB.Message({
+    //     data: 1
+    // })
+    // get_thr_data_publisher.publish()
+}
 
 
   
@@ -876,7 +817,7 @@ document.getElementById('settings_screen').onclick = function(){
 
 // ##############     Additional options     #################
 
-let stat_flash = [0, 50, 100, 150];
+let stat_flash = [0, 40, 90, 150];
 let stat_flash_id = 0 
 
 function light(){
@@ -897,9 +838,10 @@ document.getElementById('flashlight').onclick = function(){
     light();    
 }
 
-let manipulator = 0
+
 
 function greb(v){
+    let manipulator = 0
     manipulator = v;
     // document.getElementById('trionixGrab').value = manipulator;
 
@@ -907,7 +849,7 @@ function greb(v){
         data: Math.floor(manipulator)
     });
     manipulator_publisher.publish(cmd);
-    //console.log(cmd);
+    // console.log(cmd);
 }
 
 var counter
@@ -922,7 +864,7 @@ document.getElementById('grab_1').onmousedown = function(){
 }
 document.getElementById('grab_1').onmouseup = function(){
     clearInterval(counter)
-    greb(0)
+    greb(0);
 }
 document.getElementById('grab_2').onmouseup= function(){
     clearInterval(counter)
@@ -930,32 +872,13 @@ document.getElementById('grab_2').onmouseup= function(){
 }
 
 document.getElementById('grab_2').onmousedown = function(){
-    greb(1);
-    counter = setInterval(function() {
-        // wrapper.innerHTML = count;
-        // count++;
-        greb(1);
-    }, 100);
+  greb(1);
+   counter = setInterval(function() {
+       // wrapper.innerHTML = count;
+       // count++;
+       greb(1);
+   }, 100);
 }
-
-// setInterval(function () { greb_auto(); }, 500);
-
-
-// function greb_auto(){
-//     manipulator = document.getElementById('trionixGrab').value;
-    
-//     var cmd = new ROSLIB.Message({
-//         data: Math.floor(manipulator)
-//     });
-//     manipulator_publisher.publish(cmd);
-//     // console.log("touch: " + cmd);
-// }
-//     var cmd = new ROSLIB.Message({
-//         data: Math.floor(manipulator)
-//     });
-//     manipulator_publisher.publish(cmd);
-//     // console.log("touch: " + cmd);
-// }
 
 
 
@@ -989,9 +912,9 @@ function photo(){
     // console.log(cmd + " photo")
 }
 
-// document.getElementById('photo').onclick = function(){
-//     photo();
-// }
+document.getElementById('photo').onclick = function(){
+    photo();
+}
 
 // // ########      State_Machine      #########
 
