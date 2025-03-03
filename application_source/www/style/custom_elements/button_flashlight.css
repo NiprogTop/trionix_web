@@ -1,0 +1,5 @@
+button.button-flashlight {
+    background: url("images/flashlight.png") center center no-repeat;
+    background-size: 50%;
+    background-color: rgba(var(--light-gray), 50%);
+}

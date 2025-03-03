@@ -1,0 +1,66 @@
+:root {
+    /*
+        set --border-size to 1px for show border
+        set --border-size to 0px for hide border
+    */
+    --border-size: 0px;
+}
+
+.tb-column {
+    display: flex;
+    flex-direction: column;
+
+    border: var(--border-size) solid red;
+}
+
+.tb-row {
+    display: flex;
+    flex-direction: row;
+
+    border: var(--border-size) solid red;
+}
+
+.tb-center {
+    display: flex;
+    justify-content: center;
+
+    border: var(--border-size) solid red;
+}
+
+.tb-space-evenly {
+    display: flex;
+    justify-content: space-evenly;
+
+    border: var(--border-size) solid red;
+}
+
+.tb-align-right {
+    display: flex;
+    margin-left: auto;
+}
+
+
+
+.tb-grow-10 {
+    flex-grow: 1.0;
+
+    border: var(--border-size) solid red;
+}
+
+.tb-grow-06 {
+    flex-grow: 0.6;
+
+    border: var(--border-size) solid red;
+}
+
+.tb-grow-02 {
+    flex-grow: 0.2;
+
+    border: var(--border-size) solid red;
+}
+
+.tb-grow-01 {
+    flex-grow: 0.1;
+
+    border: var(--border-size) solid red;
+}

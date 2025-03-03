@@ -1,0 +1,5 @@
+button.button-grab-right {
+    background: url("images/grab_right.png") center center no-repeat;
+    background-size: 50%;
+    background-color: rgba(var(--light-gray), 50%);
+}
