@@ -4,7 +4,9 @@
 
 @import url(holder.css);
 
-@import url(button_base.css);
+@import url(button_square_base.css);
+@import url(button_circle_base.css);
+@import url(button_rectangle_base.css);
 
 @import url(button_grab_right.css);
 @import url(button_grab_left.css);

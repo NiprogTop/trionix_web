@@ -15,13 +15,12 @@
     <script src="../../libraries/joystick_input/joy.js" defer></script>
 
     <!--<script src="scripts/galary.js" defer></script>-->
-    <!--<script src="scripts/fullscreen.js" defer></script>-->
+    <script src="scripts/fullscreen.js" defer></script>
+    <script src="scripts/main.js" defer></script>
 </head>
 
 <body>
-    <!--<div class="container1">
-        <img id="videoImage">
-    </div>-->
+    <img id="videoImage">
 
     <div id="main" class="tb-column">
         <div class="tb-row tb-space-evenly">
@@ -33,7 +32,7 @@
         <div class="tb-row tb-grow-10">
             <div class="tb-grow-01"></div>
 
-            <div class="tb-column tb-grow-01">
+            <div class="tb-column">
                 <div class="tb-grow-01"></div>
 
                 <div class="tb-grow-02 div-holder">
@@ -41,31 +40,39 @@
                     <input id="button-ch" type="checkbox" class="checkbox-slider" />
                 </div>
 
-                <div class="tb-grow-01 tb-space-evenly">
-                    <button class="button-base button-grab-right"></button>
-                    <button class="button-base button-grab-left"></button>
+                <div class="tb-space-evenly">
+                    <button id="grab_2" class="button-square-base button-grab-right"></button>
+                    <button id="grab_1" class="button-square-base button-grab-left"></button>
+                </div>
+
+                <div id="joy_screen" class="tb-align-down tb-row tb-center">
+                    <div id="joyDivLeft" class="joy_left"></div>
                 </div>
             </div>
 
-            <div class="tb-grow-01 tb-column tb-align-right">
+            <div class="tb-column tb-align-right">
                 <div class="tb-grow-01"></div>
 
                 <div class="tb-grow-01 tb-space-evenly">
-                    <button class="button-base button-fullscreen"></button>
-                    <button class="button-base button-photo"></button>
-                    <button class="button-base" style="background-color: green;"></button>
-                    <button class="button-base button-flashlight"></button>
+                    <button id="fullscreen" class="button-circle-base button-fullscreen"></button>
+                    <button id="photo" class="button-circle-base button-photo"></button>
+                    <button id="mode" class="button-circle-base" style="background-color: green;"></button>
+                    <button id="flashlight" class="button-circle-base button-flashlight"></button>
                 </div>
 
                 <div class="tb-grow-02 div-holder">
                     <div class="tb-row tb-space-evenly">
-                        <button class="button-base button-triangle-up"></button>
-                        <button class="button-base button-triangle-down"></button>
+                        <button id="pid_up" class="button-rectangle-base button-triangle-up"></button>
+                        <button id="pid_down" class="button-rectangle-base button-triangle-down"></button>
                     </div>
 
-                    <p><h2><b>Удержание глубины</b></h2></p>
+                    <p><h2><b>Установка глубины</b></h2></p>
 
-                    <a><h2><b>0.0</b></h2></a>
+                    <a><h2><b id="target_depth">0.0</b></h2></a>
+                </div>
+
+                <div id="joy_screen" class="tb-align-down tb-row tb-center">
+                    <div id="joyDivRight" class="joy_rigth"></div>
                 </div>
             </div>
 
@@ -73,7 +80,7 @@
         </div>
 
         <div class="tb-row tb-center">
-            <div class="div-holder">ROBOT NAME</div>
+            <div class="div-holder">TRIONIX</div>
         </div>
     </div>
 </body>

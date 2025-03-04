@@ -1,8 +1,8 @@
 input[type="checkbox"].checkbox-slider {
     appearance: none;
     position: relative;
-    width: 60px;
-    height: 30px;
+    width: max(5vw, 5vh);
+    height: calc(max(5vw, 5vh) / 2);
     background-color: rgb(var(--light-red));
     outline: none;
     border-radius: 100vmin;
@@ -15,8 +15,8 @@ input[type="checkbox"].checkbox-slider::before {
     position: absolute;
     top: 2px;
     left: 4px;
-    width: 26px;
-    height: 26px;
+    width: calc(max(5vw, 5vh) / 2 - 4px);
+    height: calc(max(5vw, 5vh) / 2 - 4px);
     background-color: white;
     border-radius: 50%;
     transition: 0.3s cubic-bezier(0.18, 0.89, 0.35, 1.15) all;

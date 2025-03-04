@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="style/reset.css">
+    <link rel="stylesheet" href="style/main.css">
+
+    <script src="../../libraries/roslib/roslib.min.js" defer></script>
+    <script src="../../libraries/joystick_input/joy.js" defer></script>
+
+    <!--<script src="scripts/galary.js" defer></script>-->
+    <!--<script src="scripts/fullscreen.js" defer></script>-->
+</head>
+
+<body>
+    <div class="container1">
+        <img id="videoImage">
+    </div>
+
+    <div id="control-main">
+        <div id="depth">Глубина: ---</div>
+        <div id="pitch">Дифферент: ---</div>
+        <div id="heading">Курс: ---</div>
+
+        <div class="pid_switch">
+            <label class="pid_lable">Удержание глубины</label>
+            <div class="buttonss r" id="button-1">
+                <input type="checkbox" class="checkbox" id="button-ch" />
+                <div class="knobs"></div>
+                <div class="layer"></div>
+            </div>
+        </div>
+
+        <div class="grab">
+            <button class="button btn-grab btn-grab_up" id="grab_1"></button>
+            <button class="button btn-grab btn-grab_down" id="grab_2"></button>
+        </div>
+
+        <div class="butt">
+            <button type="flashlight" class="button btn-flashlight" id="flashlight" name="flashlight"></button>
+            <button type="mode" class="button btn-mode" id="mode" name="mode"></button>
+            <button type="photo" class="button btn-photo" id="photo" name="photo"></button>
+            <button type="fullscreen" class="button btn-fullscreen" id="fullscreen" name="fullscreen"></button>
+        </div>
+
+        <div class="pid_control">
+            <button type="" class="button btn-pid-down" id="pid_down" name=""></button>
+            <button type="" class="button btn-pid-up" id="pid_up" name=""></button>
+            <div class="pid_lable">Установка глубины</div>
+            <div id="target_depth" class="pid_target_depth"> 0.0 </div>
+        </div>
+    </div>
+
+    <!--<div class="container buttons">
+        <button type="flashlight" class="button btn-flashlight" id="flashlight" name="flashlight"></button>
+        <button type="mode" class="button btn-mode" id="mode" name="mode"></button>
+        <button type="photo" class="button btn-photo" id="photo" name="photo"></button>
+        <button type="fullscreen" class="button btn-fullscreen" id="fullscreen" name="fullscreen"></button>
+
+        <div class="pid_control">
+            <button type="" class="button btn-pid-down" id="pid_down" name=""></button>
+            <button type="" class="button btn-pid-up" id="pid_up" name=""></button>
+            <div class="pid_lable">Установка глубины</div>
+            <div id="target_depth" class="pid_target_depth"> 0.0 </div>
+        </div>
+
+        <div class="grab">
+            <button type="" class="button btn-grab btn-grab_up" id="grab_1" name=""></button>
+            <button type="" class="button btn-grab btn-grab_down" id="grab_2" name=""></button>
+        </div>
+
+        <div id="depth" class="depth-class">Глубина: ---</div>
+        <div id="pitch" class="pitch-class">Дифферент: ---</div>
+        <div id="heading" class="heading-class">Курс: ---</div>
+
+        <div class="pid_switch">
+            <label class="pid_lable">Удержание глубины</label>
+            <div class="buttonss r" id="button-1">
+                <input type="checkbox" class="checkbox" id="button-ch" />
+                <div class="knobs"></div>
+                <div class="layer"></div>
+            </div>
+        </div>
+
+        <div class="name">TRIONIX</div>
+
+        <div id="joy_screen">
+            <div id="joyDivLeft" class="joy_left"></div>
+            <div id="joyDivRight" class="joy_rigth"></div>
+        </div>
+    </div>-->
+</body>
+
+</html>

@@ -3,7 +3,7 @@
         set --border-size to 1px for show border
         set --border-size to 0px for hide border
     */
-    --border-size: 0px;
+    --border-size: 1px;
 }
 
 .tb-column {
@@ -37,6 +37,11 @@
 .tb-align-right {
     display: flex;
     margin-left: auto;
+}
+
+.tb-align-down {
+    display: flex;
+    margin-top: auto;
 }
 
 

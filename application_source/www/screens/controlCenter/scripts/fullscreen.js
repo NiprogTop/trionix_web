@@ -1,4 +1,6 @@
-document.getElementById('fullscreen').onclick = function () {
+const buttonFullscreen = document.getElementById("fullscreen");
+
+buttonFullscreen.onclick = function () {
     if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen();
     } else {
