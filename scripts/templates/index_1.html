@@ -15,7 +15,7 @@
   </head>
   <body>
     <div class="container1">
-      <img id="videoImage" src="http://192.168.1.100:8090/?action=stream" >
+      <img id="videoImage" src="http://192.168.1.100:8090/?action=stream" crossorigin="anonymous" >
       <!-- <video id="videoImage" autoplay></video> -->
       <!-- <video id="video-player" autoplay></video> -->
       <!-- <canvas id="videoCanvas" class="video_stream"> -->
@@ -66,6 +66,9 @@
       <button type="mode" class="button btn-mode" id="mode" name="mode"></button>
       <button type="photo" class="button btn-photo" id="photo" name="photo"></button>
       <button type="fullscreen" class="button btn-fullscreen" id="fullscreen" name="fullscreen"></button>
+      
+      <button type="record" class="button btn-record" onclick="startRecording()"></button>
+      <a id="downloadLink" download="recorded_video.webm" crossorigin="use-credentials"></a>
       
       <div class="pid_control">
         <button type="" class="button btn-pid-down" id="pid_down" name=""></button>
@@ -148,5 +151,100 @@
 
     <script type="module" src="./static/js/main.js"></script>
     <!-- <script type="text/javascript" src="./static/js/IMU.js"></script> -->
-    </body>
+    
+    <script>
+      const fps = 30;
+      const duration = 5000; // Продолжительность записываемого видео
+
+      const streamIMG = document.getElementById('videoImage');
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+
+      let mediaRecorder;
+      let recordedBlobs;
+      let blobUrl;
+
+      function startRecording() {
+          if (!streamIMG.complete) {
+              console.error('Изображение еще не загрузилось.');
+              return;
+          }
+
+          // Добавление класса для отображения красной рамки
+          streamIMG.classList.add('recording');
+
+          // Настраиваем размер холста под размеры изображения
+          canvas.width = streamIMG.naturalWidth;
+          canvas.height = streamIMG.naturalHeight;
+
+          // Копируем изображение на холст
+          ctx.drawImage(streamIMG, 0, 0);
+
+          // Создаем временную видеопоследовательность из одного кадра
+          const stream = canvas.captureStream(fps);
+
+          // Начинаем запись
+          record(stream);
+      }
+
+      function record(stream) {
+          recordedBlobs = [];
+          const options = { mimeType: 'video/webm' };
+
+          if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+              console.error(`${options.mimeType} не поддерживается.`);
+              return;
+          }
+
+          try {
+              mediaRecorder = new MediaRecorder(stream, options);
+              mediaRecorder.onstop = () => {
+                  const blob = new Blob(recordedBlobs, { type: 'video/webm' });
+                  blobUrl = window.URL.createObjectURL(blob);
+                  const a = document.getElementById('downloadLink');
+                  a.href = blobUrl;
+                  downloadFile();
+
+                  // Замена красной рамки на зеленую
+                  streamIMG.classList.remove('recording');
+                  streamIMG.classList.add('finished-recording');
+
+                  setTimeout(() => {
+                      streamIMG.classList.add('hide-border'); // Прозрачная граница
+                      setTimeout(() => {
+                          streamIMG.classList.remove('finished-recording', 'hide-border'); // Сбрасываем все классы
+                      }, 1000); // Через одну секунду после появления прозрачной границы
+                  }, 1000); // Убираем зеленую рамку через одну секунду
+              };
+          } catch (e) {
+              console.error('Ошибка создания MediaRecorder:', e);
+              return;
+          }
+
+          mediaRecorder.ondataavailable = handleDataAvailable;
+          mediaRecorder.start();
+
+          setInterval(() => {
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              ctx.drawImage(streamIMG, 0, 0);
+          }, 1000 / fps); // Обновляем кадр с интервалом
+
+          setTimeout(() => {
+              if (mediaRecorder) {
+                  mediaRecorder.stop();
+              }
+          }, duration);
+      }
+
+      function handleDataAvailable(event) {
+          if (event.data && event.data.size > 0) {
+              recordedBlobs.push(event.data);
+          }
+      }
+
+      function downloadFile() {
+          document.getElementById('downloadLink').click(); // Инициируем скачивание файла
+      }
+  </script>
+  </body>
 </html>

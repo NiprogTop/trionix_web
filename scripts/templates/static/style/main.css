@@ -1603,3 +1603,27 @@ textarea {
 .prev:hover, .next:hover {
     background-color: rgba(0, 0, 0, 0.8);
 }
+
+.recording {
+    outline: 4px solid red;
+    outline-offset: -4px;
+}
+
+.finished-recording {
+    outline: 4px solid green;
+    outline-offset: -4px;
+    transition: all 1s ease-out;
+}
+
+.finished-recording.hide-border {
+    outline-color: transparent;
+}
+
+.btn-record{
+    background: url('../img/square.png') center center no-repeat;
+    background-size: 50% 50%;
+    background-color: #faf5f58c;
+    position: absolute;
+    left: 73%;
+    top: 15%;
+}

@@ -1,4 +1,4 @@
-var  ws_url = 'ws://192.168.1.100:9090';
+//var  ws_url = 'ws://192.168.1.100:9090';
 // var  ws_url = 'ws://192.168.1.47:9090';
 // var  ws_url = 'ws://192.168.1.101:9090';
 // var  ws_url = 'ws://0.0.0.0:9090';
@@ -9,8 +9,22 @@ let video_status = 0
 
 
 var ros = new ROSLIB.Ros({
-    url : ws_url
+    url : `ws://${localStorage.getItem("ipRobot") || "192.168.1.100"}:9090`
 });
+
+const inputIpRobot = document.getElementById("ipRobot");
+inputIpRobot.value = localStorage.getItem("ipRobot");
+inputIpRobot.addEventListener("change", () => {
+    localStorage.setItem("ipRobot", inputIpRobot.value);
+    
+    ros = new ROSLIB.Ros({
+        url : `ws://${localStorage.getItem("ipRobot")}:9090`
+    });
+    
+    document.getElementById("videoImage").src = `http://${localStorage.getItem("ipRobot")}:8090/?action=stream`;
+});
+
+document.getElementById("videoImage").src = `http://${localStorage.getItem("ipRobot") || "192.168.1.100"}:8090/?action=stream`;
 
 ros.on('connection', function() {
 console.log('Connected to websocket server.');
@@ -690,18 +704,38 @@ document.getElementById('settings_upload').onclick = function(){
     get_thr_data_publisher.publish()
 }
 
+document.getElementById("map_screen").onclick = function(){
+    document.getElementById('mapElement').style.display = "block";
+    document.getElementById('configELement').style.display = "none";
+    document.getElementById('settings').style.display = 'none';
+    document.getElementById('black_page').style.display = 'block';
+    document.getElementById('menu__toggle').checked = false;
+}
+
+document.getElementById("config_screen").onclick = function(){
+    document.getElementById('mapElement').style.display = "none";
+    document.getElementById('configELement').style.display = "block";
+    document.getElementById('settings').style.display = 'none';
+    document.getElementById('black_page').style.display = 'block';
+    document.getElementById('menu__toggle').checked = false;
+}
+
 document.getElementById('main_screen').onclick = function(){
+    document.getElementById("mapElement").style.display = "none";
+    document.getElementById('configELement').style.display = "none";
     document.getElementById('settings').style.display == 'block' ? document.getElementById('settings').style.display = 'none' : document.getElementById('settings').style.display = 'none';
     // document.getElementById('missions').style.display == 'block' ? document.getElementById('missions').style.display = 'none' : document.getElementById('missions').style.display = 'none';
     document.getElementById('black_page').style.display == 'block' ? document.getElementById('black_page').style.display = 'none' : document.getElementById('black_page').style.display = 'none';
-    document.getElementById('photo_galary').style.display == 'block' ? document.getElementById('photo_galary').style.display = 'none' : document.getElementById('photo_galary').style.display = 'none';
+    // document.getElementById('photo_galary').style.display == 'block' ? document.getElementById('photo_galary').style.display = 'none' : document.getElementById('photo_galary').style.display = 'none';
     document.getElementById('menu__toggle').checked = false;
 }
 
 document.getElementById('settings_screen').onclick = function(){
+    document.getElementById("mapElement").style.display = "none";
+    document.getElementById('configELement').style.display = "none";
     // document.getElementById('missions').style.display == 'block' ? document.getElementById('missions').style.display = 'none' : document.getElementById('missions').style.display = 'none';
     document.getElementById('settings').style.display == 'block' ? document.getElementById('settings').style.display = 'block' : document.getElementById('settings').style.display = 'block';
-    document.getElementById('photo_galary').style.display == 'none' ? document.getElementById('photo_galary').style.display = 'none' : document.getElementById('photo_galary').style.display = 'none';
+    // document.getElementById('photo_galary').style.display == 'none' ? document.getElementById('photo_galary').style.display = 'none' : document.getElementById('photo_galary').style.display = 'none';
     document.getElementById('black_page').style.display == 'block' ? document.getElementById('black_page').style.display = 'block' : document.getElementById('black_page').style.display = 'block';
     document.getElementById('menu__toggle').checked = false;
     // const save_data = new ROSLIB.Message({
@@ -710,17 +744,17 @@ document.getElementById('settings_screen').onclick = function(){
     get_thr_data_publisher.publish()
 }
 
-document.getElementById('photo_screen').onclick = function(){
-    // document.getElementById('missions').style.display == 'block' ? document.getElementById('missions').style.display = 'none' : document.getElementById('missions').style.display = 'none';
-    document.getElementById('settings').style.display == 'none' ? document.getElementById('settings').style.display = 'none' : document.getElementById('settings').style.display = 'none';
-    document.getElementById('photo_galary').style.display == 'block' ? document.getElementById('photo_galary').style.display = 'block' : document.getElementById('photo_galary').style.display = 'block';
-    document.getElementById('black_page').style.display == 'block' ? document.getElementById('black_page').style.display = 'block' : document.getElementById('black_page').style.display = 'block';
-    document.getElementById('menu__toggle').checked = false;
-    // const save_data = new ROSLIB.Message({
-    //     data: 1
-    // })
-    // get_thr_data_publisher.publish()
-}
+// document.getElementById('photo_screen').onclick = function(){
+//     // document.getElementById('missions').style.display == 'block' ? document.getElementById('missions').style.display = 'none' : document.getElementById('missions').style.display = 'none';
+//     document.getElementById('settings').style.display == 'none' ? document.getElementById('settings').style.display = 'none' : document.getElementById('settings').style.display = 'none';
+//     document.getElementById('photo_galary').style.display == 'block' ? document.getElementById('photo_galary').style.display = 'block' : document.getElementById('photo_galary').style.display = 'block';
+//     document.getElementById('black_page').style.display == 'block' ? document.getElementById('black_page').style.display = 'block' : document.getElementById('black_page').style.display = 'block';
+//     document.getElementById('menu__toggle').checked = false;
+//     // const save_data = new ROSLIB.Message({
+//     //     data: 1
+//     // })
+//     // get_thr_data_publisher.publish()
+// }
 
 
   

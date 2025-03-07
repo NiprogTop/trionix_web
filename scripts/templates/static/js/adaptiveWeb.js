@@ -13,7 +13,7 @@ const elementsForChange = {
     "settings_screen": allRobotArray,
     "map_screen": allRobotArray,
     "config_screen": allRobotArray,
-    "photo_screen": allRobotArray.filter(type => ![robot_t.bag].includes(type)) // Для всех роботов, кроме "bag"
+    /*"photo_screen": allRobotArray.filter(type => ![robot_t.bag].includes(type)) // Для всех роботов, кроме "bag"*/
 };
 
 function reDisplayELements(dictElement, robotType) {
