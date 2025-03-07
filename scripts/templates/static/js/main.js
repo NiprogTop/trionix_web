@@ -159,11 +159,18 @@ let thr_config_name
 let thr_config_position
 let mission = []
 
-let G_MAX_FORWARD_BACKWARD = JSON.parse(JSON.parse(localStorage.getItem("G_MAX_FORWARD_BACKWARD") || "[-0.0035, -0.065, -0.1]")) // -1 
+if (localStorage.getItem("G_MAX_FORWARD_BACKWARD") == undefined || localStorage.getItem("G_MAX_FORWARD_BACKWARD") == "")
+    localStorage.setItem("G_MAX_FORWARD_BACKWARD", JSON.stringify("[-0.0035, -0.065, -0.1]"));
+if (localStorage.getItem("G_MAX_UP_DOWN") == undefined || localStorage.getItem("G_MAX_UP_DOWN") == "")
+    localStorage.setItem("G_MAX_UP_DOWN", JSON.stringify("[-0.0085, -0.06, -0.1]"));
+if (localStorage.getItem("G_MAX_ANGULAR") == undefined || localStorage.getItem("G_MAX_ANGULAR") == "")
+    localStorage.setItem("G_MAX_ANGULAR", JSON.stringify("[0.001, 0.003, 0.005]"));
+
+let G_MAX_FORWARD_BACKWARD = JSON.parse(JSON.parse(localStorage.getItem("G_MAX_FORWARD_BACKWARD"))) // -1 
 // const G_MAX_BACKWARD = 1
-let G_MAX_UP_DOWN = JSON.parse(JSON.parse(localStorage.getItem("G_MAX_UP_DOWN") || "[-0.0085, -0.06, -0.1]")) // -1 
+let G_MAX_UP_DOWN = JSON.parse(JSON.parse(localStorage.getItem("G_MAX_UP_DOWN"))) // -1 
 // const G_MAX_UP = 1
-let G_MAX_ANGULAR = JSON.parse(JSON.parse(localStorage.getItem("G_MAX_ANGULAR") || "[0.001, 0.003, 0.005]")) // 0.15 
+let G_MAX_ANGULAR = JSON.parse(JSON.parse(localStorage.getItem("G_MAX_ANGULAR"))) // 0.15 
 //let G_MAX_PITCH_ANGULAR = [0.1, 0.1, 0.1] //0.2
 
 console.log(G_MAX_FORWARD_BACKWARD);
