@@ -11,9 +11,10 @@ const elementsForChange = {
     "main_screen": allRobotArray,
     "mission_screen": [robot_t.guppy],
     "settings_screen": allRobotArray,
-    "map_screen": allRobotArray,
+    "map_screen": [],
     "config_screen": allRobotArray,
-    /*"photo_screen": allRobotArray.filter(type => ![robot_t.bag].includes(type)) // Для всех роботов, кроме "bag"*/
+    "speed_screen": allRobotArray,
+    "galary_screen": allRobotArray.filter(type => ![robot_t.bag].includes(type)) // Для всех роботов, кроме "bag"
 };
 
 function reDisplayELements(dictElement, robotType) {

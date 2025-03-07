@@ -159,12 +159,16 @@ let thr_config_name
 let thr_config_position
 let mission = []
 
-let G_MAX_FORWARD_BACKWARD = [-0.0035, -0.065, -0.1] // -1 
+let G_MAX_FORWARD_BACKWARD = JSON.parse(JSON.parse(localStorage.getItem("G_MAX_FORWARD_BACKWARD") || "[-0.0035, -0.065, -0.1]")) // -1 
 // const G_MAX_BACKWARD = 1
-let G_MAX_UP_DOWN = [-0.0085, -0.06, -0.1] // -1 
+let G_MAX_UP_DOWN = JSON.parse(JSON.parse(localStorage.getItem("G_MAX_UP_DOWN") || "[-0.0085, -0.06, -0.1]")) // -1 
 // const G_MAX_UP = 1
-let G_MAX_ANGULAR = [0.001, 0.003, 0.005] // 0.15 
-let G_MAX_PITCH_ANGULAR = [0.1, 0.1, 0.1] //0.2
+let G_MAX_ANGULAR = JSON.parse(JSON.parse(localStorage.getItem("G_MAX_ANGULAR") || "[0.001, 0.003, 0.005]")) // 0.15 
+//let G_MAX_PITCH_ANGULAR = [0.1, 0.1, 0.1] //0.2
+
+console.log(G_MAX_FORWARD_BACKWARD);
+console.log(G_MAX_UP_DOWN);
+console.log(G_MAX_ANGULAR);
 
 let G_K_id = 0 
 let G_K_color = ['green', 'yellow' ,'red']
@@ -380,9 +384,9 @@ let gamepadAPI = {
 		return newPress;
 	},
 	buttons: [ // XBox360 layout
-		'A','B','---','X',
-		'Y','----','LB','RB',
-		'LT','RT','select','start','down','up','RJ',
+		'A','B','X','Y',
+		'LB','RB', '----','----',
+		'select','start','----','----','down','up','RT',
 	],
 	buttonsCache: [],
 	buttonsStatus: [],
@@ -413,8 +417,11 @@ let gamepadAPI = {
             if (gamepadAPI.buttonPressed("select", 0)){
                 G_mode()
             }
-            if (gamepadAPI.buttonPressed("Y", "hold")){
+            if (gamepadAPI.buttonPressed("X", "hold")){
                 depth_change();
+            }
+            if (gamepadAPI.buttonPressed("Y", "hold")){
+                startRecording();
             }
             
         }
@@ -709,6 +716,8 @@ document.getElementById("map_screen").onclick = function(){
     document.getElementById('configELement').style.display = "none";
     document.getElementById('settings').style.display = 'none';
     document.getElementById('black_page').style.display = 'block';
+    document.getElementById("photo_galary").style.display = "none";
+    document.getElementById("speedElement").style.display = "none";
     document.getElementById('menu__toggle').checked = false;
 }
 
@@ -717,6 +726,8 @@ document.getElementById("config_screen").onclick = function(){
     document.getElementById('configELement').style.display = "block";
     document.getElementById('settings').style.display = 'none';
     document.getElementById('black_page').style.display = 'block';
+    document.getElementById("photo_galary").style.display = "none";
+    document.getElementById("speedElement").style.display = "none";
     document.getElementById('menu__toggle').checked = false;
 }
 
@@ -727,6 +738,8 @@ document.getElementById('main_screen').onclick = function(){
     // document.getElementById('missions').style.display == 'block' ? document.getElementById('missions').style.display = 'none' : document.getElementById('missions').style.display = 'none';
     document.getElementById('black_page').style.display == 'block' ? document.getElementById('black_page').style.display = 'none' : document.getElementById('black_page').style.display = 'none';
     // document.getElementById('photo_galary').style.display == 'block' ? document.getElementById('photo_galary').style.display = 'none' : document.getElementById('photo_galary').style.display = 'none';
+    document.getElementById("photo_galary").style.display = "none";
+    document.getElementById("speedElement").style.display = "none";
     document.getElementById('menu__toggle').checked = false;
 }
 
@@ -737,11 +750,33 @@ document.getElementById('settings_screen').onclick = function(){
     document.getElementById('settings').style.display == 'block' ? document.getElementById('settings').style.display = 'block' : document.getElementById('settings').style.display = 'block';
     // document.getElementById('photo_galary').style.display == 'none' ? document.getElementById('photo_galary').style.display = 'none' : document.getElementById('photo_galary').style.display = 'none';
     document.getElementById('black_page').style.display == 'block' ? document.getElementById('black_page').style.display = 'block' : document.getElementById('black_page').style.display = 'block';
+    document.getElementById("photo_galary").style.display = "none";
+    document.getElementById("speedElement").style.display = "none";
     document.getElementById('menu__toggle').checked = false;
     // const save_data = new ROSLIB.Message({
     //     data: 1
     // })
     get_thr_data_publisher.publish()
+}
+
+document.getElementById("galary_screen").onclick = function(){
+    document.getElementById('mapElement').style.display = "none";
+    document.getElementById('configELement').style.display = "none";
+    document.getElementById('settings').style.display = 'none';
+    document.getElementById('black_page').style.display = 'block';
+    document.getElementById("photo_galary").style.display = "block";
+    document.getElementById("speedElement").style.display = "none";
+    document.getElementById('menu__toggle').checked = false;
+}
+
+document.getElementById("speed_screen").onclick = function(){
+    document.getElementById('mapElement').style.display = "none";
+    document.getElementById('configELement').style.display = "none";
+    document.getElementById('settings').style.display = 'none';
+    document.getElementById('black_page').style.display = 'block';
+    document.getElementById("photo_galary").style.display = "none";
+    document.getElementById("speedElement").style.display = "block";
+    document.getElementById('menu__toggle').checked = false;
 }
 
 // document.getElementById('photo_screen').onclick = function(){
@@ -1085,4 +1120,126 @@ document.getElementById('photo').onclick = function(){
 //     };
 // });
 
+document.getElementById("button_record").addEventListener("click", () => {startRecording();});
 
+const fps = 30;
+const duration = 30000; // Продолжительность записываемого видео
+
+const streamIMG = document.getElementById('videoImage');
+const canvas = document.createElement('canvas');
+const ctx = canvas.getContext('2d');
+
+let mediaRecorder;
+let recordedBlobs;
+let blobUrl;
+
+function startRecording() {
+    if (!streamIMG.complete) {
+        console.error('Изображение еще не загрузилось.');
+        return;
+    }
+
+    // Добавление класса для отображения красной рамки
+    streamIMG.classList.add('recording');
+
+    // Настраиваем размер холста под размеры изображения
+    canvas.width = streamIMG.naturalWidth;
+    canvas.height = streamIMG.naturalHeight;
+
+    // Копируем изображение на холст
+    ctx.drawImage(streamIMG, 0, 0);
+
+    // Создаем временную видеопоследовательность из одного кадра
+    const stream = canvas.captureStream(fps);
+
+    // Начинаем запись
+    record(stream);
+}
+
+function record(stream) {
+    recordedBlobs = [];
+    const options = { mimeType: 'video/webm' };
+
+    if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+        console.error(`${options.mimeType} не поддерживается.`);
+        return;
+    }
+
+    try {
+        mediaRecorder = new MediaRecorder(stream, options);
+        mediaRecorder.onstop = () => {
+            const blob = new Blob(recordedBlobs, { type: 'video/webm' });
+            blobUrl = window.URL.createObjectURL(blob);
+            const a = document.getElementById('downloadLink');
+            a.href = blobUrl;
+            a.download = `${new Date().toLocaleString("ru-RU", { hour12: false }).replace(", ", "_")}.webm`;
+            downloadFile();
+
+            // Замена красной рамки на зеленую
+            streamIMG.classList.remove('recording');
+            streamIMG.classList.add('finished-recording');
+
+            setTimeout(() => {
+                streamIMG.classList.add('hide-border'); // Прозрачная граница
+                setTimeout(() => {
+                    streamIMG.classList.remove('finished-recording', 'hide-border'); // Сбрасываем все классы
+                }, 1000); // Через одну секунду после появления прозрачной границы
+            }, 1000); // Убираем зеленую рамку через одну секунду
+        };
+    } catch (e) {
+        console.error('Ошибка создания MediaRecorder:', e);
+        return;
+    }
+
+    mediaRecorder.ondataavailable = handleDataAvailable;
+    mediaRecorder.start();
+
+    setInterval(() => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(streamIMG, 0, 0);
+    }, 1000 / fps); // Обновляем кадр с интервалом
+
+    setTimeout(() => {
+        if (mediaRecorder) {
+            mediaRecorder.stop();
+        }
+    }, duration);
+}
+
+function handleDataAvailable(event) {
+    if (event.data && event.data.size > 0) {
+        recordedBlobs.push(event.data);
+    }
+}
+
+function downloadFile() {
+    document.getElementById('downloadLink').click(); // Инициируем скачивание файла
+}
+
+
+///
+const input_G_MAX_FORWARD_BACKWARD = document.getElementById("G_MAX_FORWARD_BACKWARD");
+const input_G_MAX_UP_DOWN = document.getElementById("G_MAX_UP_DOWN");
+const input_G_MAX_ANGULAR = document.getElementById("G_MAX_ANGULAR");
+
+input_G_MAX_FORWARD_BACKWARD.value = JSON.stringify(G_MAX_FORWARD_BACKWARD);
+input_G_MAX_UP_DOWN.value = JSON.stringify(G_MAX_UP_DOWN);
+input_G_MAX_ANGULAR.value = JSON.stringify(G_MAX_ANGULAR);
+
+input_G_MAX_FORWARD_BACKWARD.onchange = () => {
+    localStorage.setItem("G_MAX_FORWARD_BACKWARD", JSON.stringify(input_G_MAX_FORWARD_BACKWARD.value));
+    G_MAX_FORWARD_BACKWARD = JSON.parse(input_G_MAX_FORWARD_BACKWARD.value);
+    console.log(G_MAX_FORWARD_BACKWARD);
+};
+
+input_G_MAX_UP_DOWN.onchange = () => {
+    localStorage.setItem("G_MAX_UP_DOWN", JSON.stringify(input_G_MAX_UP_DOWN.value));
+    G_MAX_UP_DOWN = JSON.parse(input_G_MAX_UP_DOWN.value);
+    console.log(G_MAX_UP_DOWN);
+};
+
+input_G_MAX_ANGULAR.onchange = () => {
+    localStorage.setItem("G_MAX_ANGULAR", JSON.stringify(input_G_MAX_ANGULAR.value));
+    G_MAX_ANGULAR = JSON.parse(input_G_MAX_ANGULAR.value);
+    console.log(G_MAX_ANGULAR);
+};
