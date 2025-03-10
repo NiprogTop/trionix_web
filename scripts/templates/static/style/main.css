@@ -232,6 +232,37 @@ body{
     /* align-content: center; */
 }
 
+#speedElement .blockname{
+  /* position: relative; */
+  color: #eeeeee;
+  font-size: 1.8em;
+  font-weight: 600;
+  text-transform: uppercase;
+  width: auto;
+  text-align: center;
+  padding: 3vh 0 2vh 0;
+  /* border: solid 3px #03f437; */
+  /* align-content: center; */
+}
+
+#speedElement {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    position: absolute;
+    z-index: 8;
+    width: 100%;
+    height: 100%;
+    font-size: 1.2em;
+}
+
+#speedElement > div > input[type="number"] {
+    text-align: center;
+    width: 10%;
+    align-self: center;
+    font-size: 1.2em;
+}
+
 #settings .settings_grid{
     display: grid;
     padding: 2vh 0;

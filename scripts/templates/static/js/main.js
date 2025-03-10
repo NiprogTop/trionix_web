@@ -159,19 +159,39 @@ let thr_config_name
 let thr_config_position
 let mission = []
 
-if (localStorage.getItem("G_MAX_FORWARD_BACKWARD") == undefined || localStorage.getItem("G_MAX_FORWARD_BACKWARD") == "")
-    localStorage.setItem("G_MAX_FORWARD_BACKWARD", JSON.stringify("[-0.0035, -0.065, -0.1]"));
-if (localStorage.getItem("G_MAX_UP_DOWN") == undefined || localStorage.getItem("G_MAX_UP_DOWN") == "")
-    localStorage.setItem("G_MAX_UP_DOWN", JSON.stringify("[-0.0085, -0.06, -0.1]"));
-if (localStorage.getItem("G_MAX_ANGULAR") == undefined || localStorage.getItem("G_MAX_ANGULAR") == "")
-    localStorage.setItem("G_MAX_ANGULAR", JSON.stringify("[0.001, 0.003, 0.005]"));
+if (localStorage.getItem("G_MAX_FORWARD_BACKWARD_1") == undefined || localStorage.getItem("G_MAX_FORWARD_BACKWARD_1") == "")
+    localStorage.setItem("G_MAX_FORWARD_BACKWARD_1", String(-0.0035));
+if (localStorage.getItem("G_MAX_FORWARD_BACKWARD_2") == undefined || localStorage.getItem("G_MAX_FORWARD_BACKWARD_2") == "")
+    localStorage.setItem("G_MAX_FORWARD_BACKWARD_2", String(-0.065));
+if (localStorage.getItem("G_MAX_FORWARD_BACKWARD_3") == undefined || localStorage.getItem("G_MAX_FORWARD_BACKWARD_3") == "")
+    localStorage.setItem("G_MAX_FORWARD_BACKWARD_3", String(-0.07));
 
-let G_MAX_FORWARD_BACKWARD = JSON.parse(JSON.parse(localStorage.getItem("G_MAX_FORWARD_BACKWARD"))) // -1 
-// const G_MAX_BACKWARD = 1
-let G_MAX_UP_DOWN = JSON.parse(JSON.parse(localStorage.getItem("G_MAX_UP_DOWN"))) // -1 
-// const G_MAX_UP = 1
-let G_MAX_ANGULAR = JSON.parse(JSON.parse(localStorage.getItem("G_MAX_ANGULAR"))) // 0.15 
-//let G_MAX_PITCH_ANGULAR = [0.1, 0.1, 0.1] //0.2
+if (localStorage.getItem("G_MAX_UP_DOWN_1") == undefined || localStorage.getItem("G_MAX_UP_DOWN_1") == "")
+    localStorage.setItem("G_MAX_UP_DOWN_1", String(-0.0085));
+if (localStorage.getItem("G_MAX_UP_DOWN_2") == undefined || localStorage.getItem("G_MAX_UP_DOWN_2") == "")
+    localStorage.setItem("G_MAX_UP_DOWN_2", String(-0.06));
+if (localStorage.getItem("G_MAX_UP_DOWN_3") == undefined || localStorage.getItem("G_MAX_UP_DOWN_3") == "")
+    localStorage.setItem("G_MAX_UP_DOWN_3", String(-0.07));
+
+if (localStorage.getItem("G_MAX_ANGULAR_1") == undefined || localStorage.getItem("G_MAX_ANGULAR_1") == "")
+    localStorage.setItem("G_MAX_ANGULAR_1", String(0.001));
+if (localStorage.getItem("G_MAX_ANGULAR_2") == undefined || localStorage.getItem("G_MAX_ANGULAR_2") == "")
+    localStorage.setItem("G_MAX_ANGULAR_2", String(0.002));
+if (localStorage.getItem("G_MAX_ANGULAR_3") == undefined || localStorage.getItem("G_MAX_ANGULAR_3") == "")
+    localStorage.setItem("G_MAX_ANGULAR_3", String(0.002));
+
+let G_MAX_FORWARD_BACKWARD = Array(
+    parseFloat(localStorage.getItem("G_MAX_FORWARD_BACKWARD_1")),
+    parseFloat(localStorage.getItem("G_MAX_FORWARD_BACKWARD_2")),
+    parseFloat(localStorage.getItem("G_MAX_FORWARD_BACKWARD_3")));
+let G_MAX_UP_DOWN = Array(
+    parseFloat(localStorage.getItem("G_MAX_UP_DOWN_1")),
+    parseFloat(localStorage.getItem("G_MAX_UP_DOWN_2")),
+    parseFloat(localStorage.getItem("G_MAX_UP_DOWN_3")));
+let G_MAX_ANGULAR = Array(
+    parseFloat(localStorage.getItem("G_MAX_ANGULAR_1")),
+    parseFloat(localStorage.getItem("G_MAX_ANGULAR_2")),
+    parseFloat(localStorage.getItem("G_MAX_ANGULAR_3")));
 
 console.log(G_MAX_FORWARD_BACKWARD);
 console.log(G_MAX_UP_DOWN);
@@ -782,7 +802,7 @@ document.getElementById("speed_screen").onclick = function(){
     document.getElementById('settings').style.display = 'none';
     document.getElementById('black_page').style.display = 'block';
     document.getElementById("photo_galary").style.display = "none";
-    document.getElementById("speedElement").style.display = "block";
+    document.getElementById("speedElement").style.display = "flex";
     document.getElementById('menu__toggle').checked = false;
 }
 
@@ -893,7 +913,7 @@ document.getElementById("speed_screen").onclick = function(){
 
 // ##############     Additional options     #################
 
-let stat_flash = [0, 40, 90, 150];
+let stat_flash = [0, 20, 40, 60];
 let stat_flash_id = 0 
 
 function light(){
@@ -1225,28 +1245,96 @@ function downloadFile() {
 
 
 ///
-const input_G_MAX_FORWARD_BACKWARD = document.getElementById("G_MAX_FORWARD_BACKWARD");
-const input_G_MAX_UP_DOWN = document.getElementById("G_MAX_UP_DOWN");
-const input_G_MAX_ANGULAR = document.getElementById("G_MAX_ANGULAR");
+const input_G_MAX_FORWARD_BACKWARD_1 = document.getElementById("G_MAX_FORWARD_BACKWARD_1");
+const input_G_MAX_FORWARD_BACKWARD_2 = document.getElementById("G_MAX_FORWARD_BACKWARD_2");
+const input_G_MAX_FORWARD_BACKWARD_3 = document.getElementById("G_MAX_FORWARD_BACKWARD_3");
 
-input_G_MAX_FORWARD_BACKWARD.value = JSON.stringify(G_MAX_FORWARD_BACKWARD);
-input_G_MAX_UP_DOWN.value = JSON.stringify(G_MAX_UP_DOWN);
-input_G_MAX_ANGULAR.value = JSON.stringify(G_MAX_ANGULAR);
+function change_full_G_MAX_FORWARD_BACKWARD() {
+    if (input_G_MAX_FORWARD_BACKWARD_1.value === "" || input_G_MAX_FORWARD_BACKWARD_1.value === undefined)
+        input_G_MAX_FORWARD_BACKWARD_1.value = "0";
+    if (input_G_MAX_FORWARD_BACKWARD_2.value === "" || input_G_MAX_FORWARD_BACKWARD_2.value === undefined)
+        input_G_MAX_FORWARD_BACKWARD_2.value = "0";
+    if (input_G_MAX_FORWARD_BACKWARD_3.value === "" || input_G_MAX_FORWARD_BACKWARD_3.value === undefined)
+        input_G_MAX_FORWARD_BACKWARD_3.value = "0";
 
-input_G_MAX_FORWARD_BACKWARD.onchange = () => {
-    localStorage.setItem("G_MAX_FORWARD_BACKWARD", JSON.stringify(input_G_MAX_FORWARD_BACKWARD.value));
-    G_MAX_FORWARD_BACKWARD = JSON.parse(input_G_MAX_FORWARD_BACKWARD.value);
-    console.log(G_MAX_FORWARD_BACKWARD);
-};
+    localStorage.setItem("G_MAX_FORWARD_BACKWARD_1", input_G_MAX_FORWARD_BACKWARD_1.value);
+    localStorage.setItem("G_MAX_FORWARD_BACKWARD_2", input_G_MAX_FORWARD_BACKWARD_2.value);
+    localStorage.setItem("G_MAX_FORWARD_BACKWARD_3", input_G_MAX_FORWARD_BACKWARD_3.value);
 
-input_G_MAX_UP_DOWN.onchange = () => {
-    localStorage.setItem("G_MAX_UP_DOWN", JSON.stringify(input_G_MAX_UP_DOWN.value));
-    G_MAX_UP_DOWN = JSON.parse(input_G_MAX_UP_DOWN.value);
-    console.log(G_MAX_UP_DOWN);
-};
+    G_MAX_FORWARD_BACKWARD = Array(
+        parseFloat(localStorage.getItem("G_MAX_FORWARD_BACKWARD_1")),
+        parseFloat(localStorage.getItem("G_MAX_FORWARD_BACKWARD_2")),
+        parseFloat(localStorage.getItem("G_MAX_FORWARD_BACKWARD_3")));
+}
 
-input_G_MAX_ANGULAR.onchange = () => {
-    localStorage.setItem("G_MAX_ANGULAR", JSON.stringify(input_G_MAX_ANGULAR.value));
-    G_MAX_ANGULAR = JSON.parse(input_G_MAX_ANGULAR.value);
-    console.log(G_MAX_ANGULAR);
-};
+input_G_MAX_FORWARD_BACKWARD_1.onchange = change_full_G_MAX_FORWARD_BACKWARD;
+input_G_MAX_FORWARD_BACKWARD_2.onchange = change_full_G_MAX_FORWARD_BACKWARD;
+input_G_MAX_FORWARD_BACKWARD_3.onchange = change_full_G_MAX_FORWARD_BACKWARD;
+
+input_G_MAX_FORWARD_BACKWARD_1.value = localStorage.getItem("G_MAX_FORWARD_BACKWARD_1");
+input_G_MAX_FORWARD_BACKWARD_2.value = localStorage.getItem("G_MAX_FORWARD_BACKWARD_2");
+input_G_MAX_FORWARD_BACKWARD_3.value = localStorage.getItem("G_MAX_FORWARD_BACKWARD_3");
+
+
+
+const input_G_MAX_UP_DOWN_1 = document.getElementById("G_MAX_UP_DOWN_1");
+const input_G_MAX_UP_DOWN_2 = document.getElementById("G_MAX_UP_DOWN_2");
+const input_G_MAX_UP_DOWN_3 = document.getElementById("G_MAX_UP_DOWN_3");
+
+function change_full_G_MAX_UP_DOWN() {
+    if (input_G_MAX_UP_DOWN_1.value === "" || input_G_MAX_UP_DOWN_1.value === undefined)
+        input_G_MAX_UP_DOWN_1.value = "0";
+    if (input_G_MAX_UP_DOWN_2.value === "" || input_G_MAX_UP_DOWN_2.value === undefined)
+        input_G_MAX_UP_DOWN_2.value = "0";
+    if (input_G_MAX_UP_DOWN_3.value === "" || input_G_MAX_UP_DOWN_3.value === undefined)
+        input_G_MAX_UP_DOWN_3.value = "0";
+
+    localStorage.setItem("G_MAX_UP_DOWN_1", input_G_MAX_UP_DOWN_1.value);
+    localStorage.setItem("G_MAX_UP_DOWN_2", input_G_MAX_UP_DOWN_2.value);
+    localStorage.setItem("G_MAX_UP_DOWN_3", input_G_MAX_UP_DOWN_3.value);
+
+    G_MAX_UP_DOWN = Array(
+        parseFloat(localStorage.getItem("G_MAX_UP_DOWN_1")),
+        parseFloat(localStorage.getItem("G_MAX_UP_DOWN_2")),
+        parseFloat(localStorage.getItem("G_MAX_UP_DOWN_3")));
+}
+
+input_G_MAX_UP_DOWN_1.onchange = change_full_G_MAX_UP_DOWN;
+input_G_MAX_UP_DOWN_2.onchange = change_full_G_MAX_UP_DOWN;
+input_G_MAX_UP_DOWN_3.onchange = change_full_G_MAX_UP_DOWN;
+
+input_G_MAX_UP_DOWN_1.value = localStorage.getItem("G_MAX_UP_DOWN_1");
+input_G_MAX_UP_DOWN_2.value = localStorage.getItem("G_MAX_UP_DOWN_2");
+input_G_MAX_UP_DOWN_3.value = localStorage.getItem("G_MAX_UP_DOWN_3");
+
+
+
+const input_G_MAX_ANGULAR_1 = document.getElementById("G_MAX_ANGULAR_1");
+const input_G_MAX_ANGULAR_2 = document.getElementById("G_MAX_ANGULAR_2");
+const input_G_MAX_ANGULAR_3 = document.getElementById("G_MAX_ANGULAR_3");
+
+function change_full_G_MAX_ANGULAR() {
+    if (input_G_MAX_ANGULAR_1.value === "" || input_G_MAX_ANGULAR_1.value === undefined)
+        input_G_MAX_ANGULAR_1.value = "0";
+    if (input_G_MAX_ANGULAR_2.value === "" || input_G_MAX_ANGULAR_2.value === undefined)
+        input_G_MAX_ANGULAR_2.value = "0";
+    if (input_G_MAX_ANGULAR_3.value === "" || input_G_MAX_ANGULAR_3.value === undefined)
+        input_G_MAX_ANGULAR_3.value = "0";
+
+    localStorage.setItem("G_MAX_ANGULAR_1", input_G_MAX_ANGULAR_1.value);
+    localStorage.setItem("G_MAX_ANGULAR_2", input_G_MAX_ANGULAR_2.value);
+    localStorage.setItem("G_MAX_ANGULAR_3", input_G_MAX_ANGULAR_3.value);
+
+    G_MAX_ANGULAR = Array(
+        parseFloat(localStorage.getItem("G_MAX_ANGULAR_1")),
+        parseFloat(localStorage.getItem("G_MAX_ANGULAR_2")),
+        parseFloat(localStorage.getItem("G_MAX_ANGULAR_3")));
+}
+
+input_G_MAX_ANGULAR_1.onchange = change_full_G_MAX_ANGULAR;
+input_G_MAX_ANGULAR_2.onchange = change_full_G_MAX_ANGULAR;
+input_G_MAX_ANGULAR_3.onchange = change_full_G_MAX_ANGULAR;
+
+input_G_MAX_ANGULAR_1.value = localStorage.getItem("G_MAX_ANGULAR_1");
+input_G_MAX_ANGULAR_2.value = localStorage.getItem("G_MAX_ANGULAR_2");
+input_G_MAX_ANGULAR_3.value = localStorage.getItem("G_MAX_ANGULAR_3");

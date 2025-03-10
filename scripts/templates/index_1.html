@@ -37,17 +37,26 @@
       </div>
     </div>
 
-    <div id="speedElement" style="display: none; position: absolute; z-index: 8; width: 100%; height: 100%;">
-      <div align="center" style="height: 100%;">
-        <div>
-          G_MAX_FORWARD_BACKWARD <input id="G_MAX_FORWARD_BACKWARD"/>
-        </div>
-        <div>
-          G_MAX_UP_DOWN <input id="G_MAX_UP_DOWN"/>
-        </div>
-        <div>
-          G_MAX_ANGULAR <input id="G_MAX_ANGULAR"/>
-        </div>
+    <div id="speedElement" align="center">
+      <h2 class="blockname">Коэффициенты вперед/назад<br />(G_MAX_FORWARD_BACKWARD)</h2>
+      <div>
+        <input type="number" step="0.0001" id="G_MAX_FORWARD_BACKWARD_1" style="background-color: green;" />
+        <input type="number" step="0.0001" id="G_MAX_FORWARD_BACKWARD_2" style="background-color: yellow;" />
+        <input type="number" step="0.0001" id="G_MAX_FORWARD_BACKWARD_3" style="background-color: red;" />
+      </div>
+      
+      <h2 class="blockname">Коэффициенты вверх/вниз<br />(G_MAX_UP_DOWN)</h2>
+      <div>
+        <input type="number" step="0.0001" id="G_MAX_UP_DOWN_1" style="background-color: green;" />
+        <input type="number" step="0.0001" id="G_MAX_UP_DOWN_2" style="background-color: yellow;" />
+        <input type="number" step="0.0001" id="G_MAX_UP_DOWN_3" style="background-color: red;" />
+      </div>
+
+      <h2 class="blockname">Коэффициенты углов<br />(G_MAX_ANGULAR)</h2>
+      <div>
+        <input type="number" step="0.0001" id="G_MAX_ANGULAR_1" style="background-color: green;" />
+        <input type="number" step="0.0001" id="G_MAX_ANGULAR_2" style="background-color: yellow;" />
+        <input type="number" step="0.0001" id="G_MAX_ANGULAR_3" style="background-color: red;" />
       </div>
     </div>
 
@@ -66,7 +75,7 @@
           <li><a class="menu__item"  id="map_screen" href="#">Карты</a></li>
           <li><a class="menu__item"  id="galary_screen" href="#">Галерея</a></li>
           <li><a class="menu__item"  id="config_screen" href="#">Найтрока конфигурации PID</a></li>
-          <li><a class="menu__item"  id="speed_screen" href="#">Карта скосроти</a></li>
+          <li><a class="menu__item"  id="speed_screen" href="#">Карта скорости</a></li>
           <li><a class="menu__item"  id="mission_screen" href="#">Автономность</a></li>
           <li><a class="menu__item"  id="settings_screen" href="#">Настройки</a></li>
         </ul>
