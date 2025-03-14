@@ -274,8 +274,8 @@ function control() {
         // forward_backward = smooth_force(forward_backward, gamepadAPI.axesStatus[3])
         // console.log(left_right)
         // console.log(forward_backward)
-        pitch_moment_down = butList[6]
-        pitch_moment_up = butList[7]
+        // pitch_moment_down = butList[6]
+        // pitch_moment_up = butList[7]
 
         var cmd = new ROSLIB.Message({        
             // force: {
@@ -285,7 +285,7 @@ function control() {
             },
             // torque: {
             angular: {
-                // y: pitch_moment_down * G_MAX_PITCH_ANGULAR[G_K_id] + pitch_moment_up * G_MAX_PITCH_ANGULAR[G_K_id] * -1,
+                y: pitch_moment_down * 0.08 - pitch_moment_up * 0.08,
                 z: (left_right * G_MAX_ANGULAR[G_K_id] )
             }
         });
@@ -412,7 +412,7 @@ let gamepadAPI = {
 	},
 	buttons: [ // XBox360 layout
 		'A','B','X','Y',
-		'LB','RB', '----','----',
+		'LB','RB', 'pitchUp','pitchDown',
 		'select','start','----','----','down','up','RT',
 	],
 	buttonsCache: [],
@@ -450,7 +450,8 @@ let gamepadAPI = {
             if (gamepadAPI.buttonPressed("Y", "hold")){
                 startRecording();
             }
-            
+            pitch_moment_up = gamepadAPI.buttonPressed("pitchUp", "hold");
+            pitch_moment_down = gamepadAPI.buttonPressed("pitchDown", "hold");
         }
     }
 };
