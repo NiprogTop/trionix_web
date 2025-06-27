@@ -1151,7 +1151,7 @@ document.getElementById('photo').onclick = function(){
 document.getElementById("button_record").addEventListener("click", () => {startRecording();});
 
 const fps = 30;
-const duration = 30000; // Продолжительность записываемого видео
+const duration = /*30000*/5000; // Продолжительность записываемого видео
 
 const streamIMG = document.getElementById('videoImage');
 const canvas = document.createElement('canvas');
@@ -1195,29 +1195,30 @@ function record(stream) {
 
     try {
         mediaRecorder = new MediaRecorder(stream, options);
-        mediaRecorder.onstop = () => {
-            const blob = new Blob(recordedBlobs, { type: 'video/webm' });
-            blobUrl = window.URL.createObjectURL(blob);
-            const a = document.getElementById('downloadLink');
-            a.href = blobUrl;
-            a.download = `${new Date().toLocaleString("ru-RU", { hour12: false }).replace(", ", "_")}.webm`;
-            downloadFile();
-
-            // Замена красной рамки на зеленую
-            streamIMG.classList.remove('recording');
-            streamIMG.classList.add('finished-recording');
-
-            setTimeout(() => {
-                streamIMG.classList.add('hide-border'); // Прозрачная граница
-                setTimeout(() => {
-                    streamIMG.classList.remove('finished-recording', 'hide-border'); // Сбрасываем все классы
-                }, 1000); // Через одну секунду после появления прозрачной границы
-            }, 1000); // Убираем зеленую рамку через одну секунду
-        };
     } catch (e) {
         console.error('Ошибка создания MediaRecorder:', e);
         return;
     }
+
+    mediaRecorder.onstop = () => {
+        const blob = new Blob(recordedBlobs, { type: 'video/webm' });
+        blobUrl = window.URL.createObjectURL(blob);
+        const a = document.getElementById('downloadLink');
+        a.href = blobUrl;
+        a.download = `${new Date().toLocaleString("ru-RU", { hour12: false }).replace(", ", "_")}.webm`;
+        downloadFile();
+
+        // Замена красной рамки на зеленую
+        streamIMG.classList.remove('recording');
+        streamIMG.classList.add('finished-recording');
+
+        setTimeout(() => {
+            streamIMG.classList.add('hide-border'); // Прозрачная граница
+            setTimeout(() => {
+                streamIMG.classList.remove('finished-recording', 'hide-border'); // Сбрасываем все классы
+            }, 1000); // Через одну секунду после появления прозрачной границы
+        }, 1000); // Убираем зеленую рамку через одну секунду
+    };
 
     mediaRecorder.ondataavailable = handleDataAvailable;
     mediaRecorder.start();
